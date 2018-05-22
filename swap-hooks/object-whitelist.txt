@@ -1,0 +1,43 @@
+# Static methods
+ClassSize
+InstanceSize
+ClassOffset
+MonitorOffset
+SetHashCodeSeed
+GenerateIdentityHashCode
+CopyObject
+# Static bit manipulation methods added by me
+GetBits32
+SetBits32
+ClearBits32
+AssignBits32
+GetBits8
+SetBits8
+ClearBits8
+AssignBits8
+GetBitsAtomic8
+SetBitsAtomic8
+ClearBitsAtomic8
+TestBitMethods
+# Bit manipulation methods added by me
+GetIgnoreReadFlag
+SetIgnoreReadFlag
+ClearIgnoreReadFlag
+GetWriteCounter
+IncrWriteCounter
+ClearWriteCounter
+GetReadCounter
+IncrReadCounter
+ClearReadCounter
+GetWriteShiftRegister
+UpdateWriteShiftRegister
+GetReadShiftRegister
+UpdateReadShiftRegister
+GetDirtyBit
+SetDirtyBit
+ClearDirtyBit
+GetStubFlag
+GetPadding
+SetPadding
+# Special cases
+SetReadBarrierPointer

@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">SQLiteBenchmark</string>
+    <string name="room_activity_label">Room Benchmark</string>
+</resources>
