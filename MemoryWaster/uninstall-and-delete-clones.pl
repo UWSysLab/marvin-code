@@ -3,15 +3,20 @@
 use warnings;
 use strict;
 
-my $usage = "./uninstall-and-delete-clones.pl num-clones";
-die $usage unless @ARGV == 1;
+my $PARENT_PACKAGE = "edu.washington.cs.nl35";
+my $CLONE_DIR = "..";
 
-my $numClones = shift;
+my $usage = "./uninstall-and-delete-clones.pl app-name num-clones";
+die $usage unless @ARGV == 2;
+
+my ($appName, $numClones) = @ARGV;
+
+my $packageName = lc $appName;
 
 for (my $i = 0; $i < $numClones; $i++) {
-    system("adb uninstall edu.washington.cs.nl35.memorywaster$i");
+    system("adb uninstall $PARENT_PACKAGE.$packageName$i");
 }
 
 for (my $i = 0; $i < $numClones; $i++) {
-    system("rm -r ../MemoryWaster$i");
+    system("rm -r $CLONE_DIR/$appName$i");
 }
