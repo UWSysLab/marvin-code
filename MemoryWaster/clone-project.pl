@@ -3,46 +3,76 @@
 use warnings;
 use strict;
 
-my $usage = "./clone-project.pl clone-name";
+# This script creates and compiles a copy of an Android Studio project that is
+# identical except for having a different app name and application ID.
+#
+# The "parent package name" passed in as an argument is the prefix before the
+# app name in the package hierarchy; i.e., for an app called "FooBar" where the
+# code is in package "com.mycompany.foobar", the parent package name is
+# "com.mycompany".
+#
+# There are a few restrictions that must apply for this script to work on a
+# project:
+#
+# 1) There must be a single module called "app" in the project.
+#
+# 2) All Java source files must be in the top-level package of the app
+#    ("com.mycompany.foobar" in the above example).
+#
+# 3) There must not be any JNI code in the project.
+#
+# There may be other restrictions as well. For best results, make your app as
+# simple as possible.
 
-die $usage unless @ARGV == 1;
+my $usage = "./clone-project.pl parent-package-name app-path clone-path";
 
-my $copyName = shift;
+die $usage unless @ARGV == 3;
 
-my $destParentDir = "..";
-my $destDir = "$destParentDir/$copyName";
+my ($parentPackage, $appPath, $clonePath) = @ARGV;
 
-system("cp -r . $destDir");
-chdir("$destDir");
+my $appName = getAppNameFromPath($appPath);
+my $copyName = getAppNameFromPath($clonePath);
 
-my $packageName = lc $copyName;
-system("mv $destDir/app/src/main/java/edu/washington/cs/nl35/memorywaster $destDir/app/src/main/java/edu/washington/cs/nl35/$packageName");
+my $destParentDir = "$clonePath/..";
 
-my $activityAwkCmd = "{if (/^package edu\\.washington\\.cs\\.nl35\\.memorywaster;\$/) { print \"package edu.washington.cs.nl35.$packageName;\" } else { print \$_; }}";
-my $codeDir = "$destDir/app/src/main/java/edu/washington/cs/nl35/$packageName";
+system("cp -r $appPath $clonePath");
+chdir("$clonePath");
 
-system("mv $codeDir/MainActivity.java $codeDir/MainActivity.java.old");
-system("awk '$activityAwkCmd' $codeDir/MainActivity.java.old > $codeDir/MainActivity.java");
+my $parentPackagePath = $parentPackage =~ s/\./\//gr;
 
-system("mv $codeDir/BaseActivity.java $codeDir/BaseActivity.java.old");
-system("awk '$activityAwkCmd' $codeDir/BaseActivity.java.old > $codeDir/BaseActivity.java");
+my $oldPackageName = lc $appName;
+my $newPackageName = lc $copyName;
+system("mv $clonePath/app/src/main/java/$parentPackagePath/$oldPackageName $clonePath/app/src/main/java/$parentPackagePath/$newPackageName");
 
-system("mv $codeDir/CompactingTriggerActivity.java $codeDir/CompactingTriggerActivity.java.old");
-system("awk '$activityAwkCmd' $codeDir/CompactingTriggerActivity.java.old > $codeDir/CompactingTriggerActivity.java");
+my $activityAwkCmd = "{if (/^package $parentPackage.$oldPackageName;\$/) { print \"package $parentPackage.$newPackageName;\" } else { print \$_; }}";
+my $codeDir = "$clonePath/app/src/main/java/$parentPackagePath/$newPackageName";
 
-my $manifestAwkCmd = "{if (/^    package=\"edu\\.washington\\.cs\\.nl35\\.memorywaster\">\$/) { print \"    package=\\\"edu.washington.cs.nl35.$packageName\\\">\";} else { print \$_; }}";
-my $manifestDir = "$destDir/app/src/main";
+my $codeDirLsOutput = `ls $codeDir`;
+my @codeFiles = split(/\s+/, $codeDirLsOutput);
+for my $codeFile (@codeFiles) {
+    system("mv $codeDir/$codeFile $codeDir/$codeFile.old");
+    system("awk '$activityAwkCmd' $codeDir/$codeFile.old > $codeDir/$codeFile");
+}
+
+my $manifestAwkCmd = "{if (/^    package=\"$parentPackage.$oldPackageName\">\$/) { print \"    package=\\\"$parentPackage.$newPackageName\\\">\";} else { print \$_; }}";
+my $manifestDir = "$clonePath/app/src/main";
 system("mv $manifestDir/AndroidManifest.xml $manifestDir/AndroidManifest.xml.old");
 system("awk '$manifestAwkCmd' $manifestDir/AndroidManifest.xml.old > $manifestDir/AndroidManifest.xml");
 
-my $buildGradleAwkCmd = "{if (/^        applicationId \"edu\.washington\.cs\.nl35\.memorywaster\"\$/) { print \"        applicationId \\\"edu.washington.cs.nl35.$packageName\\\"\"; } else { print \$_; }}";
-system("mv $destDir/app/build.gradle $destDir/app/build.gradle.old");
-system("awk '$buildGradleAwkCmd' $destDir/app/build.gradle.old > $destDir/app/build.gradle");
+my $buildGradleAwkCmd = "{if (/^        applicationId \"$parentPackage.$oldPackageName\"\$/) { print \"        applicationId \\\"$parentPackage.$newPackageName\\\"\"; } else { print \$_; }}";
+system("mv $clonePath/app/build.gradle $clonePath/app/build.gradle.old");
+system("awk '$buildGradleAwkCmd' $clonePath/app/build.gradle.old > $clonePath/app/build.gradle");
 
-my $stringsAwkCmd = "{if (/^    <string name=\"app_name\">MemoryWaster<\\/string>\$/) { print \"    <string name=\\\"app_name\\\">$copyName</string>\" ; } else { print \$_; }}";
-my $stringsDir = "$destDir/app/src/main/res/values";
+my $stringsAwkCmd = "{if (/^    <string name=\"app_name\">$appName<\\/string>\$/) { print \"    <string name=\\\"app_name\\\">$copyName</string>\" ; } else { print \$_; }}";
+my $stringsDir = "$clonePath/app/src/main/res/values";
 system("mv $stringsDir/strings.xml $stringsDir/strings.xml.old");
 system("awk '$stringsAwkCmd' $stringsDir/strings.xml.old > $stringsDir/strings.xml");
 system("rm $stringsDir/strings.xml.old");
 
 system("./gradlew assemble");
+
+sub getAppNameFromPath {
+    my $path = shift;
+    my @pathSplit = split(/\//, $path);
+    return $pathSplit[@pathSplit - 1];
+}

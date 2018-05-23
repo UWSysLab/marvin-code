@@ -9,7 +9,7 @@ die $usage unless @ARGV == 1;
 my $numClones = shift;
 
 for (my $i = 0; $i < $numClones; $i++) {
-    system("./clone-project.pl MemoryWaster$i");
+    system("./clone-project.pl edu.washington.cs.nl35 ../MemoryWaster ../MemoryWaster$i");
 }
 
 my $projectDir = `pwd`;
