@@ -23,7 +23,7 @@ long doWrite(const char * fileName, int fileSize, int blockSize) {
     }
     
 
-    int fd = open(fileName, O_CREAT | O_WRONLY);
+    int fd = open(fileName, O_CREAT | O_WRONLY, 0666);
     if (fd < 0) {
         perror("open");
         return -1;
