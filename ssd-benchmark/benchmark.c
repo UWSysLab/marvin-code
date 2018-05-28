@@ -110,14 +110,14 @@ long doOps(const char * fileName, int fileSize, int blockSize, operation_t op, b
 
 int main(int argc, char **argv) {
     const int FILE_SIZE = 256 * 1024 * 1024; // bytes
-    const int BLOCK_SIZE = 4 * 1024; // bytes
     const char * FILE_NAME = "tempfile";
-    const char * USAGE_STR = "./benchmark [read|write] [seq|random]";
+    const char * USAGE_STR = "usage: ./benchmark {read|write} {seq|random} block_size";
 
     operation_t op;
     bool random;
+    int blockSize; // bytes
 
-    if (argc != 3) {
+    if (argc != 4) {
         fprintf(stderr, "%s\n", USAGE_STR);
         exit(1);
     }
@@ -144,11 +144,17 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
+    blockSize = atoi(argv[3]);
+    if (blockSize == 0) {
+        fprintf(stderr, "%s\n", USAGE_STR);
+        exit(1);
+    }
+
     srand(time(NULL));
 
     printf("Performing %d reps of operation %s with access pattern %s, file size %d, block size %d\n",
-            FILE_SIZE / BLOCK_SIZE, argv[1], argv[2], FILE_SIZE, BLOCK_SIZE);
-    long timeMillis = doOps(FILE_NAME, FILE_SIZE, BLOCK_SIZE, op, random);
+            FILE_SIZE / blockSize, argv[1], argv[2], FILE_SIZE, blockSize);
+    long timeMillis = doOps(FILE_NAME, FILE_SIZE, blockSize, op, random);
     if (timeMillis < 0) {
         printf("Operations failed\n");
     }
