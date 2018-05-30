@@ -41,3 +41,32 @@ GetPadding
 SetPadding
 # Special cases
 SetReadBarrierPointer
+# Object methods that just call other object methods
+GetClass
+GetLockWord
+SetLockWord
+CasLockWordWeakSequentiallyConsistent
+CasLockWordWeakRelaxed
+CasLockWordWeakRelease
+IsReferenceInstance
+IsString
+IsWeakReferenceInstance
+IsSoftReferenceInstance
+IsFinalizerReferenceInstance
+IsPhantomReferenceInstance
+GetFieldBooleanVolatile
+GetFieldByteVolatile
+SetFieldBooleanVolatile
+SetFieldByteVolatile
+GetFieldCharVolatile
+GetFieldShortVolatile
+SetFieldCharVolatile
+SetFieldShortVolatile
+GetField32Volatile
+SetField32Volatile
+GetField64Volatile
+GetFieldObjectVolatile
+SetFieldObjectVolatile
+VisitInstanceFieldsReferences
+IsClassLoader
+IsDexCache
