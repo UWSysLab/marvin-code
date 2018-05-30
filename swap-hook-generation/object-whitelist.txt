@@ -43,12 +43,22 @@ SetPadding
 SetReadBarrierPointer
 # Object methods that just call other object methods
 GetClass
+SetClass
 GetLockWord
 SetLockWord
 CasLockWordWeakSequentiallyConsistent
 CasLockWordWeakRelaxed
 CasLockWordWeakRelease
+VerifierInstanceOf
+InstanceOf
+IsClass
+IsObjectArray
+IsArrayInstance
 IsReferenceInstance
+IsIntArray
+IsLongArray
+IsFloatArray
+IsDoubleArray
 IsString
 IsWeakReferenceInstance
 IsSoftReferenceInstance
