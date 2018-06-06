@@ -80,3 +80,6 @@ SetFieldObjectVolatile
 VisitInstanceFieldsReferences
 IsClassLoader
 IsDexCache
+# Methods with custom swap hooks
+SetFieldObjectWithoutWriteBarrier
+SetFieldObject
