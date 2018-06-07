@@ -41,6 +41,7 @@ GetPadding
 SetPadding
 # Special cases
 SetReadBarrierPointer
+SetFieldObject
 # Object methods that just call other object methods
 GetClass
 SetClass
@@ -82,4 +83,3 @@ IsClassLoader
 IsDexCache
 # Methods with custom swap hooks
 SetFieldObjectWithoutWriteBarrier
-SetFieldObject
