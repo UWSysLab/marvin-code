@@ -68,6 +68,7 @@ my $expectingLockMacroLine = 0;
 my @templateArgs = ();
 my @regArgs = ();
 my $methodName = "";
+my $returnType = "";
 foreach my $line (@lines) {
     print($line);
 
@@ -89,33 +90,36 @@ foreach my $line (@lines) {
         #Middle of template
         push(@templateArgs, getArgs($line));
     }
-    elsif ($line =~ /${className}::(\S+)\((.*)\).*{/) {
+    elsif ($line =~ /(inline\s+)*(\S+)\s+${className}::(\S+)\((.*)\).*{/) {
         #Full method declaration
-        $methodName = $1;
-        push(@regArgs, getArgs($2));
+        $returnType = $2;
+        $methodName = $3;
+        push(@regArgs, getArgs($4));
 
-        printPreamble($methodName, \@templateArgs, \@regArgs);
+        printPreamble($methodName, $returnType, \@templateArgs, \@regArgs);
         @templateArgs = ();
         @regArgs = ();
     }
-    elsif ($line =~ /${className}::(\S+)\((.*)\)/) {
+    elsif ($line =~ /(inline\s+)*(\S+)\s+${className}::(\S+)\((.*)\)/) {
         #Full method declaration except for lock macro line
-        $methodName = $1;
+        $returnType = $2;
+        $methodName = $3;
         $expectingLockMacroLine = 1;
-        push(@regArgs, getArgs($2));
+        push(@regArgs, getArgs($4));
     }
-    elsif ($line =~ /${className}::(\S+)\((.*)/) {
+    elsif ($line =~ /(inline\s+)*(\S+)\s+${className}::(\S+)\((.*)/) {
         #Start of method declaration
         $inDeclaration = 1;
-        $methodName = $1;
-        push(@regArgs, getArgs($2));
+        $returnType = $2;
+        $methodName = $3;
+        push(@regArgs, getArgs($4));
     }
     elsif ($line =~ /(.*)\).*{/ && $inDeclaration) {
         #End of method declaration
         $inDeclaration = 0;
         push(@regArgs, getArgs($1));
 
-        printPreamble($methodName, \@templateArgs, \@regArgs);
+        printPreamble($methodName, $returnType, \@templateArgs, \@regArgs);
         @templateArgs = ();
         @regArgs = ();
     }
@@ -133,7 +137,7 @@ foreach my $line (@lines) {
         #Lock macro line
         $expectingLockMacroLine = 0;
 
-        printPreamble($methodName, \@templateArgs, \@regArgs);
+        printPreamble($methodName, $returnType, \@templateArgs, \@regArgs);
         @templateArgs = ();
         @regArgs = ();
     }
@@ -163,6 +167,7 @@ sub listToCommaSeparatedString {
 
 sub printPreamble {
     my $methodName = shift;
+    my $returnType = shift;
     my $templateArgsRef = shift;
     my $regArgsRef = shift;
 
@@ -173,10 +178,20 @@ sub printPreamble {
     my $regArgString = listToCommaSeparatedString(@{$regArgsRef});
     if (@templateArgs > 0) {
         my $templateArgString = listToCommaSeparatedString(@{$templateArgsRef});
-        print("  SWAP_PREAMBLE_TEMPLATE($methodName, $className, GATHER_TEMPLATE_ARGS($templateArgString), $regArgString)\n");
+        if ($returnType eq "void") {
+            print("  SWAP_PREAMBLE_TEMPLATE_VOID($methodName, $className, GATHER_TEMPLATE_ARGS($templateArgString), $regArgString)\n");
+        }
+        else {
+            print("  SWAP_PREAMBLE_TEMPLATE($methodName, $className, $returnType, GATHER_TEMPLATE_ARGS($templateArgString), $regArgString)\n");
+        }
     }
     else {
-        print("  SWAP_PREAMBLE($methodName, $className, $regArgString)\n");
+        if ($returnType eq "void") {
+            print("  SWAP_PREAMBLE_VOID($methodName, $className, $regArgString)\n");
+        }
+        else {
+            print("  SWAP_PREAMBLE($methodName, $className, $returnType, $regArgString)\n");
+        }
     }
 }
 
