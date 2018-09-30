@@ -23,12 +23,12 @@ TestBitMethods
 GetIgnoreReadFlag
 SetIgnoreReadFlag
 ClearIgnoreReadFlag
-GetWriteCounter
-IncrWriteCounter
-ClearWriteCounter
-GetReadCounter
-IncrReadCounter
-ClearReadCounter
+GetWriteBit
+SetWriteBit
+ClearWriteBit
+GetReadBit
+SetReadBit
+ClearReadBit
 GetWriteShiftRegister
 UpdateWriteShiftRegister
 GetReadShiftRegister
@@ -37,6 +37,8 @@ GetDirtyBit
 SetDirtyBit
 ClearDirtyBit
 GetStubFlag
+GetNoSwapFlag
+SetNoSwapFlag
 GetPadding
 SetPadding
 # Special cases
