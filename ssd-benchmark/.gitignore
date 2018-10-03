@@ -1,0 +1,14 @@
+# Android binaries
+benchmark-arm64
+cpp-benchmark-arm64
+
+# x86 binaries
+benchmark-x86
+cpp-benchmark-x86
+
+# Temp files
+tempfile
+cpptempfile
+
+# Vim files
+*.swp
