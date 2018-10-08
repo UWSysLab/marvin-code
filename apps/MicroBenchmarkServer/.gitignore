@@ -1,0 +1,9 @@
+/target/
+
+# Vim temp files
+*.swp
+
+# Eclipse files
+.classpath
+.project
+.settings
