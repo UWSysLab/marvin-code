@@ -1,5 +1,6 @@
 package edu.washington.cs.nl35;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -47,9 +48,11 @@ public class MicroBenchmarkServer
 
                 exchange.sendResponseHeaders(200, payloadSizeBytes);
                 OutputStream output = exchange.getResponseBody();
+                BufferedOutputStream bufferedOutput = new BufferedOutputStream(output);
                 for (int i = 0; i < payloadSizeBytes; i++) {
-                    output.write(42);
+                    bufferedOutput.write(42);
                 }
+                bufferedOutput.close();
                 exchange.close();
             }
         });
