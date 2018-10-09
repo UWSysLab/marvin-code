@@ -32,9 +32,19 @@ public class MicroBenchmarkServer
         }
         server.createContext("/arraydata", new HttpHandler() {
             public void handle(HttpExchange exchange) throws IOException {
-                InputStream input = exchange.getRequestBody();
-                InputStreamReader inputReader = new InputStreamReader(input);
-                int payloadSizeBytes = inputReader.read();
+                int payloadSizeBytes = 4;
+                if (exchange.getRequestURI().getQuery() != null) {
+                    String[] querySplit = exchange.getRequestURI().getQuery().split("&");
+                    for (String queryParam : querySplit) {
+                        String[] queryParamSplit = queryParam.split("=");
+                        String key = queryParamSplit[0];
+                        String value = queryParamSplit[1];
+                        if (key.equals("size")) {
+                            payloadSizeBytes = Integer.parseInt(value);
+                        }
+                    }
+                }
+
                 exchange.sendResponseHeaders(200, payloadSizeBytes);
                 OutputStream output = exchange.getResponseBody();
                 for (int i = 0; i < payloadSizeBytes; i++) {
