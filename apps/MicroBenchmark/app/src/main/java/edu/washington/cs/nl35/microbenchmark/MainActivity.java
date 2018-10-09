@@ -1,9 +1,15 @@
 package edu.washington.cs.nl35.microbenchmark;
 
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,6 +18,10 @@ import java.util.concurrent.ThreadLocalRandom;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+
+    private static final String SERVER_HOSTNAME = "128.208.6.189";
+    private static final int SERVER_PORT = 9000;
+    private static final boolean FILL_FROM_INTERNET = false;
 
     private static final int NUM_ARRAYS = 200;
     private static final int ARRAY_SIZE = 256 * 1024;
@@ -98,17 +108,52 @@ public class MainActivity extends AppCompatActivity {
     private volatile boolean appInForeground;
     private volatile boolean workerThreadDone;
 
+    private void fillArrayFromInternet(int[] array) {
+        int arraySizeBytes = ARRAY_SIZE * 4;
+        try {
+            URL arrayDataURL = new URL("http://" + SERVER_HOSTNAME + ":" + SERVER_PORT + "/arraydata?size=" + arraySizeBytes);
+            URLConnection connection = arrayDataURL.openConnection();
+            InputStream stream = connection.getInputStream();
+            for (int j = 0; j < ARRAY_SIZE; j++) {
+                byte byte1 = (byte) stream.read();
+                byte byte2 = (byte) stream.read();
+                byte byte3 = (byte) stream.read();
+                byte byte4 = (byte) stream.read();
+                array[j] = (byte1 << 24) | (byte2 << 16) | (byte3 << 8) | byte4;
+            }
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "Error reading array data from URL: " + e);
+        } catch (IOException e) {
+            Log.e(TAG, "Error reading array data from URL: " + e);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         arrays = new ArrayList<>();
+
+        if (FILL_FROM_INTERNET) {
+            // Hack to allow networking on main thread. We want the networking calls to happen on
+            // the main thread because we're using Activity lifecycle events to time app startup.
+            // Based on this StackOverflow post: https://stackoverflow.com/a/9289190.
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitNetwork().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+
         for (int i = 0; i < NUM_ARRAYS; i++) {
             int[] array = new int[ARRAY_SIZE];
-            Arrays.fill(array, 42);
+            if (FILL_FROM_INTERNET) {
+                fillArrayFromInternet(array);
+            }
+            else {
+                Arrays.fill(array, 42);
+            }
             arrays.add(array);
         }
+
         Log.i(TAG, "Finished creating arrays");
         appInForeground = true;
         workerThreadDone = false;
