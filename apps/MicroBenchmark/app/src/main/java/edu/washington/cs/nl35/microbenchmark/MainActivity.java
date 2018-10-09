@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -113,18 +114,21 @@ public class MainActivity extends AppCompatActivity {
         try {
             URL arrayDataURL = new URL("http://" + SERVER_HOSTNAME + ":" + SERVER_PORT + "/arraydata?size=" + arraySizeBytes);
             URLConnection connection = arrayDataURL.openConnection();
-            InputStream stream = connection.getInputStream();
+            connection.setConnectTimeout(2000);
+            connection.setReadTimeout(2000);
+            BufferedInputStream bufferedInput = new BufferedInputStream(connection.getInputStream());
             for (int j = 0; j < ARRAY_SIZE; j++) {
-                byte byte1 = (byte) stream.read();
-                byte byte2 = (byte) stream.read();
-                byte byte3 = (byte) stream.read();
-                byte byte4 = (byte) stream.read();
+                byte byte1 = (byte) bufferedInput.read();
+                byte byte2 = (byte) bufferedInput.read();
+                byte byte3 = (byte) bufferedInput.read();
+                byte byte4 = (byte) bufferedInput.read();
                 array[j] = (byte1 << 24) | (byte2 << 16) | (byte3 << 8) | byte4;
             }
+            bufferedInput.close();
         } catch (MalformedURLException e) {
-            Log.e(TAG, "Error reading array data from URL: " + e);
+            throw new RuntimeException(e);
         } catch (IOException e) {
-            Log.e(TAG, "Error reading array data from URL: " + e);
+            throw new RuntimeException(e);
         }
     }
 
