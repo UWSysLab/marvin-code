@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         appInForeground = true;
-        Log.i(TAG, "MicroBenchmark onResume finished");
+        Log.i(TAG, getApplicationContext().getPackageName() + " onResume finished");
     }
 
     @Override

@@ -17,8 +17,9 @@ while(<>) {
             my $cloneNum = $2;
             print("$time\t$startedPid\t$cloneNum\tstart\n");
         }
-        if ($msg =~ /^MicroBenchmark onResume finished$/) {
-            print("$time\t$pid\tN/A\tresume\n");
+        if ($msg =~ /^$MICROBENCHMARK_NAME(\d+) onResume finished$/) {
+            my $cloneNum = $1;
+            print("$time\t$pid\t$cloneNum\tresume\n");
         }
         if ($msg =~ /^Process $MICROBENCHMARK_NAME(\d+) \(pid (\d+)\) has died$/) {
             my $cloneNum = $1;
@@ -27,7 +28,7 @@ while(<>) {
         }
         if ($msg =~ /^START u0 \{act=android\.intent\.action\.MAIN flg=0x10000000 cmp=$MICROBENCHMARK_NAME(\d+)\/\.MainActivity\} from uid \d+ on display \d+$/) {
             my $cloneNum = $1;
-            print("$time\tN/A\t$cloneNum\tstart-intent\n");
+            print("$time\t-\t$cloneNum\tstart-intent\n");
         }
     }
 }
