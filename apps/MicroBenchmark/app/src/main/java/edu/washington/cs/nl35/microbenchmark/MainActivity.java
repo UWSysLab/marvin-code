@@ -7,14 +7,16 @@ import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -105,31 +107,73 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private class LoadDataRunnable implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+                for (int i = 0; i < NUM_ARRAYS; i++) {
+                    int[] array = new int[ARRAY_SIZE];
+                    if (FILL_FROM_INTERNET) {
+                        fillArrayFromInternet(array);
+                    } else {
+                        Arrays.fill(array, 42);
+                    }
+                    arrays.add(array);
+
+                    if (i == NUM_ARRAYS * WORKING_SET_FRACTION - 1) {
+                        Log.i(TAG, getApplicationContext().getPackageName() + " finished loading working set");
+                    }
+                }
+
+                Log.i(TAG, getApplicationContext().getPackageName() + " finished loading all arrays");
+                workerThreadDone = false;
+                new Thread(new WorkerRunnable()).start();
+            }
+            catch (Exception e) {
+                handleException(e);
+            }
+        }
+    }
+
     private List<int[]> arrays;
     private volatile boolean appInForeground;
     private volatile boolean workerThreadDone;
+    private ExecutorService threadPoolExecutor;
 
-    private void fillArrayFromInternet(int[] array) {
+    private void fillArrayFromInternet(int[] array) throws IOException {
         int arraySizeBytes = ARRAY_SIZE * 4;
-        try {
-            URL arrayDataURL = new URL("http://" + SERVER_HOSTNAME + ":" + SERVER_PORT + "/arraydata?size=" + arraySizeBytes);
-            URLConnection connection = arrayDataURL.openConnection();
-            connection.setConnectTimeout(2000);
-            connection.setReadTimeout(2000);
-            BufferedInputStream bufferedInput = new BufferedInputStream(connection.getInputStream());
-            for (int j = 0; j < ARRAY_SIZE; j++) {
-                byte byte1 = (byte) bufferedInput.read();
-                byte byte2 = (byte) bufferedInput.read();
-                byte byte3 = (byte) bufferedInput.read();
-                byte byte4 = (byte) bufferedInput.read();
-                array[j] = (byte1 << 24) | (byte2 << 16) | (byte3 << 8) | byte4;
-            }
-            bufferedInput.close();
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        URL arrayDataURL = new URL("http://" + SERVER_HOSTNAME + ":" + SERVER_PORT + "/arraydata?size=" + arraySizeBytes);
+        URLConnection connection = arrayDataURL.openConnection();
+        connection.setConnectTimeout(2000);
+        connection.setReadTimeout(2000);
+        BufferedInputStream bufferedInput = new BufferedInputStream(connection.getInputStream());
+        for (int j = 0; j < ARRAY_SIZE; j++) {
+            byte byte1 = (byte) bufferedInput.read();
+            byte byte2 = (byte) bufferedInput.read();
+            byte byte3 = (byte) bufferedInput.read();
+            byte byte4 = (byte) bufferedInput.read();
+            array[j] = (byte1 << 24) | (byte2 << 16) | (byte3 << 8) | byte4;
         }
+        bufferedInput.close();
+    }
+
+    /*
+     * I need this explicit exception-handling code for dealing with exceptions in tasks submitted
+     * to the ExecutorService because ThreadPoolExecutors swallow exceptions by default. Currently
+     * this code just logs the exception and then closes the application.
+     *
+     * This StackOverflow question contains information about ThreadPoolExecutor exception handling:
+     * https://stackoverflow.com/q/2554549.
+     *
+     * This StackOverflow question contains information about how to close an application
+     * programmatically: https://stackoverflow.com/q/6330200.
+     */
+    private void handleException(Exception e) {
+        Log.e(TAG, "Caught exception: " + e);
+        Log.i(TAG, "Exiting application");
+        finishAndRemoveTask();
+        System.exit(1);
     }
 
     @Override
@@ -138,31 +182,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         arrays = new ArrayList<>();
+        threadPoolExecutor = Executors.newSingleThreadExecutor();
+        threadPoolExecutor.submit(new LoadDataRunnable());
 
-        if (FILL_FROM_INTERNET) {
-            // Hack to allow networking on main thread. We want the networking calls to happen on
-            // the main thread because we're using Activity lifecycle events to time app startup.
-            // Based on this StackOverflow post: https://stackoverflow.com/a/9289190.
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitNetwork().build();
-            StrictMode.setThreadPolicy(policy);
-        }
-
-        for (int i = 0; i < NUM_ARRAYS; i++) {
-            int[] array = new int[ARRAY_SIZE];
-            if (FILL_FROM_INTERNET) {
-                fillArrayFromInternet(array);
-            }
-            else {
-                Arrays.fill(array, 42);
-            }
-            arrays.add(array);
-        }
-
-        Log.i(TAG, "Finished creating arrays");
-        appInForeground = true;
-        workerThreadDone = false;
-
-        new Thread(new WorkerRunnable()).start();
+        Log.i(TAG, getApplicationContext().getPackageName() + " onCreate finished");
     }
 
     @Override

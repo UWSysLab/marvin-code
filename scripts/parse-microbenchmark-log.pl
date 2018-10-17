@@ -30,5 +30,13 @@ while(<>) {
             my $cloneNum = $1;
             print("$time\t-\t$cloneNum\tstart-intent\n");
         }
+        if ($msg =~ /^$MICROBENCHMARK_NAME(\d+) finished loading working set$/) {
+            my $cloneNum = $1;
+            print("$time\t$pid\t$cloneNum\tloaded-working-set\n");
+        }
+        if ($msg =~ /^$MICROBENCHMARK_NAME(\d+) finished loading all arrays$/) {
+            my $cloneNum = $1;
+            print("$time\t$pid\t$cloneNum\tloaded-all\n");
+        }
     }
 }
