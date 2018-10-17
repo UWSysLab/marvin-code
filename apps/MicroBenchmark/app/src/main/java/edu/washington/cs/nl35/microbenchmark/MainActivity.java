@@ -6,6 +6,10 @@ import android.os.Bundle;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -22,9 +26,11 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
+    private static final FillMode FILL_MODE = FillMode.DUMMY_DATA;
+    private static final boolean SAVE_ARRAYS = true;
+
     private static final String SERVER_HOSTNAME = "128.208.6.189";
     private static final int SERVER_PORT = 9000;
-    private static final boolean FILL_FROM_INTERNET = false;
 
     private static final int NUM_ARRAYS = 200;
     private static final int ARRAY_SIZE = 256 * 1024;
@@ -39,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
     private static final double WRITE_CHANCE = 0.20;
 
     private static final long OPS_PER_LOG_MSG = 100000;
+
+    private enum FillMode {NETWORK, DISK, DUMMY_DATA}
 
     private class WorkerRunnable implements Runnable {
         int total = 0;
@@ -112,12 +120,26 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run() {
             try {
+                Log.i(TAG, "Filling arrays using mode " + FILL_MODE.toString());
+                if ((FILL_MODE == FillMode.NETWORK || FILL_MODE == FillMode.DUMMY_DATA)
+                        && SAVE_ARRAYS) {
+                    Log.i(TAG, "Loaded arrays will be saved to disk");
+                }
+
                 for (int i = 0; i < NUM_ARRAYS; i++) {
                     int[] array = new int[ARRAY_SIZE];
-                    if (FILL_FROM_INTERNET) {
+                    if (FILL_MODE == FillMode.NETWORK) {
                         fillArrayFromInternet(array);
-                    } else {
+                        if (SAVE_ARRAYS) {
+                            saveArrayDataToDisk(array, i);
+                        }
+                    } else if (FILL_MODE == FillMode.DISK) {
+                        loadArrayDataFromDisk(array, i);
+                    } else { // FILL_MODE == FillMode.DUMMY_DATA
                         Arrays.fill(array, 42);
+                        if (SAVE_ARRAYS) {
+                            saveArrayDataToDisk(array, i);
+                        }
                     }
                     arrays.add(array);
 
@@ -148,14 +170,51 @@ public class MainActivity extends AppCompatActivity {
         connection.setConnectTimeout(2000);
         connection.setReadTimeout(2000);
         BufferedInputStream bufferedInput = new BufferedInputStream(connection.getInputStream());
-        for (int j = 0; j < ARRAY_SIZE; j++) {
+        deserializeArray(bufferedInput, array);
+        bufferedInput.close();
+    }
+
+    private File getArrayFile(int arrayNum) {
+        String fileName = "array" + arrayNum;
+        File file = new File(getApplicationContext().getFilesDir(), fileName);
+        return file;
+    }
+
+    private void saveArrayDataToDisk(int[] array, int arrayNum) throws IOException {
+        File file = getArrayFile(arrayNum);
+        BufferedOutputStream bufferedOutput = new BufferedOutputStream(new FileOutputStream(file));
+        serializeArray(array, bufferedOutput);
+        bufferedOutput.close();
+    }
+
+    private void loadArrayDataFromDisk(int[] array, int arrayNum) throws IOException {
+        File file = getArrayFile(arrayNum);
+        BufferedInputStream bufferedInput = new BufferedInputStream(new FileInputStream(file));
+        deserializeArray(bufferedInput, array);
+        bufferedInput.close();
+    }
+
+    private void deserializeArray(BufferedInputStream bufferedInput, int[] array) throws IOException {
+        for (int i = 0; i < ARRAY_SIZE; i++) {
             byte byte1 = (byte) bufferedInput.read();
             byte byte2 = (byte) bufferedInput.read();
             byte byte3 = (byte) bufferedInput.read();
             byte byte4 = (byte) bufferedInput.read();
-            array[j] = (byte1 << 24) | (byte2 << 16) | (byte3 << 8) | byte4;
+            array[i] = (byte1 << 24) | (byte2 << 16) | (byte3 << 8) | byte4;
         }
-        bufferedInput.close();
+    }
+
+    private void serializeArray(int[] array, BufferedOutputStream bufferedOutput) throws IOException {
+        for (int i = 0; i < ARRAY_SIZE; i++) {
+            byte byte1 = (byte)(array[i] >> 24);
+            byte byte2 = (byte)(array[i] >> 16);
+            byte byte3 = (byte)(array[i] >> 8);
+            byte byte4 = (byte)array[i];
+            bufferedOutput.write(byte1);
+            bufferedOutput.write(byte2);
+            bufferedOutput.write(byte3);
+            bufferedOutput.write(byte4);
+        }
     }
 
     /*
