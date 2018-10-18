@@ -201,26 +201,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void deserializeArray(BufferedInputStream bufferedInput, int[] array) throws IOException {
+        byte[] byteArray = new byte[ARRAY_SIZE * 4];
+        bufferedInput.read(byteArray);
         for (int i = 0; i < ARRAY_SIZE; i++) {
-            byte byte1 = (byte) bufferedInput.read();
-            byte byte2 = (byte) bufferedInput.read();
-            byte byte3 = (byte) bufferedInput.read();
-            byte byte4 = (byte) bufferedInput.read();
+            byte byte1 = byteArray[i * 4];
+            byte byte2 = byteArray[i * 4 + 1];
+            byte byte3 = byteArray[i * 4 + 2];
+            byte byte4 = byteArray[i * 4 + 3];
             array[i] = (byte1 << 24) | (byte2 << 16) | (byte3 << 8) | byte4;
         }
     }
 
     private void serializeArray(int[] array, BufferedOutputStream bufferedOutput) throws IOException {
+        byte[] byteArray = new byte[ARRAY_SIZE * 4];
         for (int i = 0; i < ARRAY_SIZE; i++) {
             byte byte1 = (byte)(array[i] >> 24);
             byte byte2 = (byte)(array[i] >> 16);
             byte byte3 = (byte)(array[i] >> 8);
             byte byte4 = (byte)array[i];
-            bufferedOutput.write(byte1);
-            bufferedOutput.write(byte2);
-            bufferedOutput.write(byte3);
-            bufferedOutput.write(byte4);
+            byteArray[i * 4] = byte1;
+            byteArray[i * 4 + 1] = byte2;
+            byteArray[i * 4 + 2] = byte3;
+            byteArray[i * 4 + 3] = byte4;
         }
+        bufferedOutput.write(byteArray);
     }
 
     /*
