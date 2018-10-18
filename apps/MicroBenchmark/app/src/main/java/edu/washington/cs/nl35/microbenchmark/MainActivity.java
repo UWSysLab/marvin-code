@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final FillMode FILL_MODE = FillMode.DUMMY_DATA;
     private static final boolean SAVE_ARRAYS = false;
+    private static final boolean LOG_FILL_TIMES = false;
 
     private static final String SERVER_HOSTNAME = "35.211.96.243";
     private static final int SERVER_PORT = 8000;
@@ -131,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
 
                 for (int i = 0; i < NUM_ARRAYS; i++) {
                     int[] array = new int[ARRAY_SIZE];
+                    long startTime = System.nanoTime();
                     if (FILL_MODE == FillMode.NETWORK) {
                         fillArrayFromInternet(array);
                         if (SAVE_ARRAYS) {
@@ -144,7 +146,13 @@ public class MainActivity extends AppCompatActivity {
                             saveArrayDataToDisk(array, i);
                         }
                     }
+                    long endTime = System.nanoTime();
+                    long fillTimeMs = (endTime - startTime) / (1000 * 1000);
                     arrays.add(array);
+
+                    if (LOG_FILL_TIMES) {
+                        Log.i(TAG, "Fill time for array " + i + ": " + fillTimeMs + " ms");
+                    }
 
                     if (i == NUM_ARRAYS * WORKING_SET_FRACTION - 1) {
                         Log.i(TAG, getApplicationContext().getPackageName() + " finished loading working set");
