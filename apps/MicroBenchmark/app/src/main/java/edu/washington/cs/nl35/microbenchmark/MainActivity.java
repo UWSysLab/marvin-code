@@ -24,13 +24,15 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class MainActivity extends AppCompatActivity {
 
+    private enum FillMode {NETWORK, DISK, DUMMY_DATA}
+
     private static final String TAG = "MainActivity";
 
     private static final FillMode FILL_MODE = FillMode.DUMMY_DATA;
-    private static final boolean SAVE_ARRAYS = true;
+    private static final boolean SAVE_ARRAYS = false;
 
-    private static final String SERVER_HOSTNAME = "128.208.6.189";
-    private static final int SERVER_PORT = 9000;
+    private static final String SERVER_HOSTNAME = "35.211.96.243";
+    private static final int SERVER_PORT = 8000;
 
     private static final int NUM_ARRAYS = 200;
     private static final int ARRAY_SIZE = 256 * 1024;
@@ -44,9 +46,10 @@ public class MainActivity extends AppCompatActivity {
     private static final double OUTSIDE_WORKING_SET_CHANCE = 0.001;
     private static final double WRITE_CHANCE = 0.20;
 
-    private static final long OPS_PER_LOG_MSG = 100000;
-
-    private enum FillMode {NETWORK, DISK, DUMMY_DATA}
+    private List<int[]> arrays;
+    private volatile boolean appInForeground;
+    private volatile boolean workerThreadDone;
+    private ExecutorService threadPoolExecutor;
 
     private class WorkerRunnable implements Runnable {
         int total = 0;
@@ -157,11 +160,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-    private List<int[]> arrays;
-    private volatile boolean appInForeground;
-    private volatile boolean workerThreadDone;
-    private ExecutorService threadPoolExecutor;
 
     private void fillArrayFromInternet(int[] array) throws IOException {
         int arraySizeBytes = ARRAY_SIZE * 4;
