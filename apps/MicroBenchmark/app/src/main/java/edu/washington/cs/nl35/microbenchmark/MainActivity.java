@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     long endTime = System.nanoTime();
-                    long fillTimeMs = (endTime - startTime) / (1000 * 1000);
+                    double fillTimeMs = (double)(endTime - startTime) / (1000 * 1000);
                     arrays.add(array);
 
                     if (LOG_FILL_TIMES) {
@@ -202,7 +202,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void deserializeArray(BufferedInputStream bufferedInput, int[] array) throws IOException {
         byte[] byteArray = new byte[ARRAY_SIZE * 4];
+        long readStartTime = System.nanoTime();
         bufferedInput.read(byteArray);
+        long readEndTime = System.nanoTime();
         for (int i = 0; i < ARRAY_SIZE; i++) {
             byte byte1 = byteArray[i * 4];
             byte byte2 = byteArray[i * 4 + 1];
@@ -210,10 +212,20 @@ public class MainActivity extends AppCompatActivity {
             byte byte4 = byteArray[i * 4 + 3];
             array[i] = (byte1 << 24) | (byte2 << 16) | (byte3 << 8) | byte4;
         }
+        long deserializeEndTime = System.nanoTime();
+        if (LOG_FILL_TIMES) {
+            double readTimeMs = (double)(readEndTime - readStartTime) / (1000 * 1000);
+            double deserializeTimeMs = (double)(deserializeEndTime - readEndTime) / (1000 * 1000);
+            double totalTimeMs = (double)(deserializeEndTime - readStartTime) / (1000 * 1000);
+            Log.i(TAG, "deserializeArray() read time: " + readTimeMs
+                    + " ms, deserialize time: " + deserializeTimeMs + " ms, total time: "
+                    + totalTimeMs + " ms");
+        }
     }
 
     private void serializeArray(int[] array, BufferedOutputStream bufferedOutput) throws IOException {
         byte[] byteArray = new byte[ARRAY_SIZE * 4];
+        long serializeStartTime = System.nanoTime();
         for (int i = 0; i < ARRAY_SIZE; i++) {
             byte byte1 = (byte)(array[i] >> 24);
             byte byte2 = (byte)(array[i] >> 16);
@@ -224,7 +236,17 @@ public class MainActivity extends AppCompatActivity {
             byteArray[i * 4 + 2] = byte3;
             byteArray[i * 4 + 3] = byte4;
         }
+        long serializeEndTime = System.nanoTime();
         bufferedOutput.write(byteArray);
+        long writeEndTime = System.nanoTime();
+        if (LOG_FILL_TIMES) {
+            double serializeTimeMs = (double)(serializeEndTime - serializeStartTime) / (1000 * 1000);
+            double writeTimeMs = (double)(writeEndTime - serializeEndTime) / (1000 * 1000);
+            double totalTimeMs = (double)(writeEndTime - serializeStartTime) / (1000 * 1000);
+            Log.i(TAG, "serializeArray() serialize time: " + serializeTimeMs
+                    + " ms, write time: " + writeTimeMs + " ms, total time: " + totalTimeMs
+                    + " ms");
+        }
     }
 
     /*
