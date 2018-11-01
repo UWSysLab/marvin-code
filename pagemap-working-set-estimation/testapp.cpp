@@ -19,13 +19,29 @@ int main() {
     void * startAddr = (void *)0xc0000000;
     size_t length = 1 * 1024 * 1024;
     mmap(startAddr, length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
-    *((int *)startAddr) = 4;
-    std::cout << "Hello world!" << std::endl;
-    writeMemory(startAddr, length, 'a');
-    int sum = readMemory(startAddr, length);
-    std::cout << sum << std::endl;
-    writeMemory(startAddr, length, 'b');
-    sum = readMemory(startAddr, length);
-    std::cout << sum << std::endl;
+
+    bool done = false;
+    int sum = 0;
+    while (!done) {
+        char input = 0;
+        std::cin >> input;
+        switch (input) {
+        case 'w':
+            writeMemory(startAddr, length, 'w');
+            std::cout << "Wrote memory." << std::endl;
+            break;
+        case 'r':
+            sum = readMemory(startAddr, length);
+            std::cout << "Read memory; sum is " << sum << std::endl;
+            break;
+        case 'd':
+            done = true;
+            std::cout << "Exiting program." << std::endl;
+            break;
+        default:
+            std::cout << "Unrecognized input: " << input << std::endl;
+        }
+    }
+
     return 0;
 }
