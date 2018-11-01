@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private static final long BACKGROUND_SLEEP_TIME = 1000; // milliseconds
     private static final long BACKGROUND_WORK_TIME = 50; // milliseconds
 
+    private static final boolean WORKER_THREAD_ENABLED = true;
     private static final double WORKING_SET_FRACTION = 0.10;
     private static final double OUTSIDE_WORKING_SET_CHANCE = 0.001;
     private static final double WRITE_CHANCE = 0.20;
@@ -160,8 +161,11 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Log.i(TAG, getApplicationContext().getPackageName() + " finished loading all arrays");
-                workerThreadDone = false;
-                new Thread(new WorkerRunnable()).start();
+
+                if (WORKER_THREAD_ENABLED) {
+                    workerThreadDone = false;
+                    new Thread(new WorkerRunnable()).start();
+                }
             }
             catch (Exception e) {
                 handleException(e);
