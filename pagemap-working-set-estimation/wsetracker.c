@@ -79,10 +79,15 @@ int checkPageSoftDirty(uint64_t page) {
     return softDirtyBit;
 }
 
-int checkPageIdle(uint64_t page) {
+int checkPageNonIdle(uint64_t page) {
     unsigned char word[8];
     readLongWordBytes(pagemapFd, page, word);
     uint64_t pfn = getPfn(word);
+    if (pfn == 0) {
+        // If there is no PFN, then the page is not mapped (?). In that case,
+        // count it as idle.
+        return 0;
+    }
 
     off_t bitmapWordOffset = pfn / 64;
     unsigned char bitmapWordBytes[8];
@@ -91,7 +96,7 @@ int checkPageIdle(uint64_t page) {
     unsigned int bitOffset = pfn % 64;
     int idleBit = getBit(bitmapWordBytes, bitOffset);
 
-    return idleBit;
+    return !idleBit;
 }
 
 void markPageIdle(uint64_t page) {
@@ -149,8 +154,8 @@ int countNonIdlePages(uint64_t startAddress, uint64_t endAddress) {
 
     int count = 0;
     for (uint64_t page = startPage; page < endPage; page++) {
-        int isIdle = checkPageIdle(page);
-        count += !isIdle;
+        int isNonIdle = checkPageNonIdle(page);
+        count += isNonIdle;
     }
     return count;
 }
