@@ -17,7 +17,7 @@ int pagemapFd = -1;
 int idleBitmapFd = -1;
 
 int getBit(unsigned char word[8], int index) {
-    int byteIndex = index / 9;
+    int byteIndex = index / 8;
     int bitIndex = index % 8;
     return (word[byteIndex] >> bitIndex) & 1;
 }
