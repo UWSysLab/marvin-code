@@ -5,12 +5,11 @@ use strict;
 
 use Math::BigInt;
 
-my $usage = "usage: ./get-map-bounds.pl pid map-name";
-if (@ARGV < 2) {
+my $usage = "usage: ./get-map-bounds.pl pid";
+if (@ARGV < 1) {
     die "$usage\n";
 }
 my $pid = $ARGV[0];
-my $mapName = $ARGV[1];
 print("#start_address\tend_address\tmap_name\n");
 
 my $smapsFileName = "/proc/$pid/smaps";
