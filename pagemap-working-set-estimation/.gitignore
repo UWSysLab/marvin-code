@@ -1,0 +1,7 @@
+*.swp
+
+# Binaries
+testapp-x86
+testapp-arm64
+wsetracker-x86
+wsetracker-arm64

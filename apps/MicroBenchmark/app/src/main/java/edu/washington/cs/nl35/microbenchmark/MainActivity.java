@@ -39,13 +39,13 @@ public class MainActivity extends AppCompatActivity {
     private static final int ARRAY_SIZE = 256 * 1024;
 
     private static final long FOREGROUND_SLEEP_TIME = 200; // milliseconds
-    private static final long FOREGROUND_WORK_TIME = 200; // milliseconds
     private static final long BACKGROUND_SLEEP_TIME = 1000; // milliseconds
-    private static final long BACKGROUND_WORK_TIME = 50; // milliseconds
 
+    private static final boolean WORKER_THREAD_ENABLED = true;
+    private static final long ITERS_PER_ROUND = 100000;
+    private static final long INT_OP_LOOPS_PER_ITER = 40;
     private static final double WORKING_SET_FRACTION = 0.10;
     private static final double OUTSIDE_WORKING_SET_CHANCE = 0.001;
-    private static final double WRITE_CHANCE = 0.20;
 
     private List<int[]> arrays;
     private volatile boolean appInForeground;
@@ -53,44 +53,16 @@ public class MainActivity extends AppCompatActivity {
     private ExecutorService threadPoolExecutor;
 
     private class WorkerRunnable implements Runnable {
-        int total = 0;
-        long opCounter = 0;
-
-        private void doOperation() {
-            boolean outsideWorkingSet = ThreadLocalRandom.current().nextDouble() < OUTSIDE_WORKING_SET_CHANCE;
-            boolean doWrite = ThreadLocalRandom.current().nextDouble() < WRITE_CHANCE;
-
-            int arrayIndex;
-            if (outsideWorkingSet) {
-                arrayIndex = ThreadLocalRandom.current().nextInt(NUM_ARRAYS);
-            }
-            else {
-                arrayIndex = ThreadLocalRandom.current().nextInt((int)(NUM_ARRAYS * WORKING_SET_FRACTION));
-            }
-            int indexInsideArray = ThreadLocalRandom.current().nextInt(ARRAY_SIZE);
-            int value = ThreadLocalRandom.current().nextInt();
-
-            if (doWrite) {
-                arrays.get(arrayIndex)[indexInsideArray] = value;
-            }
-            else {
-                total += arrays.get(arrayIndex)[indexInsideArray];
-            }
-
-            opCounter++;
-        }
-
         @Override
         public void run() {
+            int globalCounter = 0;
+
             while (!workerThreadDone) {
-                long workTime;
                 long sleepTime;
                 if (appInForeground) {
-                    workTime = FOREGROUND_WORK_TIME;
                     sleepTime = FOREGROUND_SLEEP_TIME;
                 }
                 else {
-                    workTime = BACKGROUND_WORK_TIME;
                     sleepTime = BACKGROUND_SLEEP_TIME;
                 }
 
@@ -102,19 +74,34 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 long startTimeMillis = System.nanoTime() / (1000 * 1000);
-                boolean done = false;
-                while (!done) {
-                    for (int i = 0; i < 1000; i++) {
-                        doOperation();
+                for (int i = 0; i < ITERS_PER_ROUND; i++) {
+                    int[] getTarget;
+                    int[] putTarget;
+                    if (((double)i) / ITERS_PER_ROUND < OUTSIDE_WORKING_SET_CHANCE) {
+                        getTarget = arrays.get(i % NUM_ARRAYS);
+                        putTarget = arrays.get((i + 1) % NUM_ARRAYS);
                     }
-                    long currentTimeMillis = System.nanoTime() / (1000 * 1000);
-                    if (currentTimeMillis - startTimeMillis > workTime) {
-                        done = true;
+                    else {
+                        getTarget = arrays.get(i % (int)(NUM_ARRAYS * WORKING_SET_FRACTION));
+                        putTarget = arrays.get((i + 1) % (int)(NUM_ARRAYS * WORKING_SET_FRACTION));
                     }
+                    int valA = getTarget[(i + globalCounter) % ARRAY_SIZE];
+                    int valB = getTarget[((i + 1) + globalCounter) % ARRAY_SIZE];
+                    for (int j = 0; j < INT_OP_LOOPS_PER_ITER; j++) {
+                        valA = valA * valB + 1;
+                        valB = valA * valB + 1;
+                    }
+                    putTarget[(i + globalCounter) % ARRAY_SIZE] = valA;
+                    putTarget[((i + 1) + globalCounter) % ARRAY_SIZE] = valB;
                 }
+                long endTimeMillis = System.nanoTime() / (1000 * 1000);
+                long durationMillis = endTimeMillis - startTimeMillis;
+                Log.i(TAG, "Worker thread performed " + ITERS_PER_ROUND + " iterations in " + durationMillis + " ms");
 
-                Log.i(TAG, "Worker thread performed " + opCounter + " ops this round");
-                opCounter = 0;
+                globalCounter++;
+                if (globalCounter > ARRAY_SIZE) {
+                    globalCounter = 0;
+                }
             }
         }
     }
@@ -160,8 +147,11 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Log.i(TAG, getApplicationContext().getPackageName() + " finished loading all arrays");
-                workerThreadDone = false;
-                new Thread(new WorkerRunnable()).start();
+
+                if (WORKER_THREAD_ENABLED) {
+                    workerThreadDone = false;
+                    new Thread(new WorkerRunnable()).start();
+                }
             }
             catch (Exception e) {
                 handleException(e);
