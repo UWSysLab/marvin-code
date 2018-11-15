@@ -191,9 +191,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void deserializeArray(BufferedInputStream bufferedInput, int[] array) throws IOException {
-        byte[] byteArray = new byte[ARRAY_SIZE * 4];
+        int byteArraySize = ARRAY_SIZE * 4;
+        byte[] byteArray = new byte[byteArraySize];
         long readStartTime = System.nanoTime();
-        bufferedInput.read(byteArray);
+        int totalBytesRead = 0;
+        while (totalBytesRead < byteArraySize) {
+            int bytesRead = bufferedInput.read(byteArray, totalBytesRead, byteArraySize - totalBytesRead);
+            totalBytesRead += bytesRead;
+        }
         long readEndTime = System.nanoTime();
         for (int i = 0; i < ARRAY_SIZE; i++) {
             byte byte1 = byteArray[i * 4];
