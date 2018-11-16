@@ -16,10 +16,10 @@ if [[ $appName = "" ]] ; then
     exit 1
 fi
 
-pid=$(ps | grep "$appName" | cut -d " " -f 5)
+pid=$(ps | grep -e "$appName$" | cut -d " " -f 5)
 while [[ $pid = "" ]] ; do
     sleep $WAIT_SLEEP_INTERVAL
-    pid=$(ps | grep "$appName" | cut -d " " -f 5)
+    pid=$(ps | grep -e "$appName$" | cut -d " " -f 5)
 done
 
 echo "App $appName started with PID $pid"
