@@ -14,8 +14,8 @@ myData$Name = factor(myData$Name, levels = myData$Name[order(myData$Time, decrea
 pdf("section-2-graph.pdf")
 ggplot(myData) +
     geom_col(mapping = aes(x = Name, y = Time, fill = System)) +
-    xlab("App") +
-    ylab("Average startup time (s)") +
+    xlab("") +
+    ylab("App switch time (s)") +
     labs(fill = "") +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     coord_fixed(0.5)
