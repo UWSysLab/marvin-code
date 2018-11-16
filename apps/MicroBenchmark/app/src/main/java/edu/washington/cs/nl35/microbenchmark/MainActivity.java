@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private static final long ITERS_PER_ROUND = 100000;
     private static final long INT_OP_LOOPS_PER_ITER = 40;
     private static final double WORKING_SET_FRACTION = 0.10;
-    private static final double OUTSIDE_WORKING_SET_CHANCE = 0.001;
+    private static final double OUTSIDE_WORKING_SET_CHANCE = 0;
 
     private List<int[]> arrays;
     private volatile boolean appInForeground;
