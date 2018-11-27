@@ -30,6 +30,6 @@ ggplot(myData) +
     xlab("") +
     ylab("App switch time (s)") +
     labs(fill = "") +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position="top") +
     coord_fixed(0.5)
 dev.off()
