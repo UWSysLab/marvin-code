@@ -21,5 +21,6 @@ ggplot(myData) +
     geom_point(mapping = aes(x = Size, y = HeapFrac, color = AppName)) +
     xlab("Object size (bytes, log scale)") +
     ylab("Fraction of heap made up of objects of that size or smaller") +
-    scale_x_continuous(trans='log10')
+    scale_x_continuous(trans='log10') +
+    coord_fixed(ratio=4.5)
 dev.off()
