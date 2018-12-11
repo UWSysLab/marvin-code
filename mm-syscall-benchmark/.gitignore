@@ -1,0 +1,4 @@
+*.swp
+
+mm-syscall-benchmark-arm64
+mm-syscall-benchmark-x86
