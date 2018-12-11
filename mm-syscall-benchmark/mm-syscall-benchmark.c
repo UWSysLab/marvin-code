@@ -28,23 +28,23 @@ int main(int argc, char ** argv) {
     }
 
     int ret;
-    struct timeval startTime;
-    ret = gettimeofday(&startTime, NULL);
+    struct timespec startTime;
+    ret = clock_gettime(CLOCK_MONOTONIC, &startTime);
     if (ret < 0) {
-        perror("gettimeofday");
+        perror("clock_gettime");
         return -1;
     }
 
     munmap(map, numBytes);
 
-    struct timeval endTime;
-    ret = gettimeofday(&endTime, NULL);
+    struct timespec endTime;
+    ret = clock_gettime(CLOCK_MONOTONIC, &endTime);
     if (ret < 0) {
-        perror("gettimeofday");
+        perror("clock_gettime");
         return -1;
     }
 
-    uint64_t timeUs = (endTime.tv_sec - startTime.tv_sec) * (1000 * 1000) + (endTime.tv_usec - startTime.tv_usec);
+    uint64_t timeUs = (endTime.tv_sec - startTime.tv_sec) * (1000 * 1000) + (endTime.tv_nsec - startTime.tv_nsec) / 1000;
     printf("Time (us): %lu\n", timeUs);
 
     return 0;
