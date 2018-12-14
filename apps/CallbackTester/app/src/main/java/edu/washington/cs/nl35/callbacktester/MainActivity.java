@@ -103,6 +103,13 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i(TAG, "onStop() called");
+        doLengthyOperation();
+    }
+
+    @Override
     public void onTrimMemory(int level) {
         Log.i(TAG, "onTrimMemory() called with level " + level);
     }
