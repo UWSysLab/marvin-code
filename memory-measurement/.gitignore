@@ -1,0 +1,6 @@
+# Output binaries
+measure-memory-arm64
+measure-memory-x86
+
+# Vim swap files
+*.swp
