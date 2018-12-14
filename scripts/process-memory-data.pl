@@ -7,7 +7,7 @@
 use warnings;
 use strict;
 
-my $MS_PRE_ALIGNPOINT = 50;
+my $MS_PRE_ALIGNPOINT = 150;
 my $MS_POST_ALIGNPOINT = 200;
 
 my $usage = "./process-memory-data.pl file1 file1-label file1-alignpoint file2 file2-label file2-alignpoint ...\n";
@@ -24,6 +24,7 @@ for (my $i = 0; $i < @ARGV; $i += 3) {
     push(@alignPoints, $ARGV[$i + 2]);
 }
 
+print("TranslatedTimestamp,RSSMB,WorkingSet\n");
 for (my $i = 0; $i < @fileNames; $i++) {
     open(FILE, $fileNames[$i]);
     while (<FILE>) {
@@ -35,13 +36,15 @@ for (my $i = 0; $i < @fileNames; $i++) {
         if ($timestamp < $alignPoints[$i] - $MS_PRE_ALIGNPOINT or $timestamp > $alignPoints[$i] + $MS_POST_ALIGNPOINT) {
             next;
         }
+        my $translatedTimestamp = $timestamp - $alignPoints[$i];
         my $statm = $lineSplit[1];
         my @statmSplit = split(/\s+/, $statm);
         if (@statmSplit < 7) {
             next;
         }
-        my $rss = $statmSplit[1];
-        print("$timestamp,$rss,$labels[$i]\n");
+        my $rssPages = $statmSplit[1];
+        my $rssMb = $rssPages * 4096 / 1024 / 1024;
+        print("$translatedTimestamp,$rssMb,$labels[$i]\n");
     }
     close(FILE);
 }
