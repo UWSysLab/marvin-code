@@ -10,21 +10,22 @@ use strict;
 my $MS_PRE_ALIGNPOINT = 150;
 my $MS_POST_ALIGNPOINT = 200;
 
-my $usage = "./process-memory-data.pl file1 file1-label file1-alignpoint file2 file2-label file2-alignpoint ...\n";
-die $usage if @ARGV < 1;
-die $usage if @ARGV % 3 != 0;
+my $usage = "./process-memory-data.pl baseline-rss-pages file1 file1-label file1-alignpoint file2 file2-label file2-alignpoint ...\n";
+die $usage if @ARGV < 4;
+die $usage if @ARGV % 3 != 1;
+
+my $baselinePages = $ARGV[0];
 
 my @fileNames;
 my @labels;
 my @alignPoints;
-
-for (my $i = 0; $i < @ARGV; $i += 3) {
+for (my $i = 1; $i < @ARGV; $i += 3) {
     push(@fileNames, $ARGV[$i]);
     push(@labels, $ARGV[$i + 1]);
     push(@alignPoints, $ARGV[$i + 2]);
 }
 
-print("TranslatedTimestamp,RSSMB,WorkingSet\n");
+print("TranslatedTimestamp,TranslatedRSSMB,WorkingSet\n");
 for (my $i = 0; $i < @fileNames; $i++) {
     open(FILE, $fileNames[$i]);
     while (<FILE>) {
@@ -44,7 +45,9 @@ for (my $i = 0; $i < @fileNames; $i++) {
         }
         my $rssPages = $statmSplit[1];
         my $rssMb = $rssPages * 4096 / 1024 / 1024;
-        print("$translatedTimestamp,$rssMb,$labels[$i]\n");
+        my $baselineMb = $baselinePages * 4096 / 1024 / 1024;
+        my $translatedRssMb = $rssMb - $baselineMb;
+        print("$translatedTimestamp,$translatedRssMb,$labels[$i]\n");
     }
     close(FILE);
 }

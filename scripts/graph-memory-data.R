@@ -16,8 +16,8 @@ myData = read.csv(inputFile, header = TRUE)
 
 pdf(outputFile)
 ggplot(myData) +
-    geom_line(mapping = aes(x = TranslatedTimestamp, y = RSSMB, color = WorkingSet)) +
+    geom_line(mapping = aes(x = TranslatedTimestamp, y = TranslatedRSSMB, color = WorkingSet)) +
     xlab("Time (ms)") +
-    ylab("RSS (MB)") +
+    ylab("RSS (MB, relative to baseline)") +
     coord_fixed(1)
 dev.off()
