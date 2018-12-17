@@ -19,5 +19,6 @@ ggplot(myData) +
     geom_line(mapping = aes(x = Time, y = NumLiveApps, color = Label)) +
     xlab("Time (s)") +
     ylab("Num live apps") +
+    labs(color = "") +
     coord_fixed(30)
 dev.off()
