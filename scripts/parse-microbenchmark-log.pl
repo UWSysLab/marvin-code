@@ -26,6 +26,10 @@ while(<>) {
             my $diedPid = $2;
             print("$time\t$diedPid\t$cloneNum\tdie\n");
         }
+        if ($msg =~ /^WIN DEATH: Window\{\w+ \w+ $MICROBENCHMARK_NAME(\d+)\/$MICROBENCHMARK_NAME\d+\.MainActivity\}$/) {
+            my $cloneNum = $1;
+            print("$time\t-\t$cloneNum\twin-death\n");
+        }
         if ($msg =~ /^START u0 \{act=android\.intent\.action\.MAIN flg=0x10000000 cmp=$MICROBENCHMARK_NAME(\d+)\/\.MainActivity\} from uid \d+ on display \d+$/) {
             my $cloneNum = $1;
             print("$time\t-\t$cloneNum\tstart-intent\n");

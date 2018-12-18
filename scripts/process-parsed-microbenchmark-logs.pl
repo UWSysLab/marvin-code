@@ -15,11 +15,15 @@ for (my $i = 0; $i < @ARGV; $i += 2) {
     push(@labels, $ARGV[$i + 1]);
 }
 
+my @problemFileNames;
+
 print("Time,NumLiveApps,Label\n");
 for (my $i = 0; $i < @fileNames; $i++) {
     my $label = $labels[$i];
     my $numLiveApps = 0;
     my $startTime;
+    my $numDeaths = 0;
+    my $numWinDeaths = 0;
     open(FILE, $fileNames[$i]);
     while(<FILE>) {
         if ($_ =~ /^timestamp\s+pid\s+clone\s+event$/) {
@@ -41,10 +45,22 @@ for (my $i = 0; $i < @fileNames; $i++) {
         }
         elsif ($event eq "die") {
             $numLiveApps--;
+            $numDeaths++;
             print("$timeDiff,$numLiveApps,$label\n");
+        }
+        elsif ($event eq "win-death") {
+            $numWinDeaths++;
         }
     }
     close(FILE);
+    if ($numDeaths != $numWinDeaths) {
+        push(@problemFileNames, $fileNames[$i]);
+    }
+}
+
+print("ERROR: these files had different counts of \"win-death\" and \"die\" events:\n");
+for (my $i = 0; $i < @problemFileNames; $i++) {
+    print("$problemFileNames[$i]\n");
 }
 
 # Copied from parse-gc-collection-working-set-log.pl
