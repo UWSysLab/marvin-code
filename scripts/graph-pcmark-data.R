@@ -1,5 +1,8 @@
 #!/usr/bin/Rscript
 
+# This script expects as input a CSV file with the following column names:
+# Average, StdDev, Benchmark, System
+
 # I used these links to figure out how to use tapply() to calculate statistics
 # over the subsets of variables that share the same factor levels:
 #
