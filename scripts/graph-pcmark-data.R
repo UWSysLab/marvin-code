@@ -24,8 +24,6 @@ outputFile = args[2]
 
 myData = read.csv(inputFile, header = TRUE)
 
-print(myData)
-
 pdf(outputFile)
 ggplot(myData, aes(x = Benchmark, group = System)) +
     geom_col(aes(y = Average, fill = System), position = "dodge") +
