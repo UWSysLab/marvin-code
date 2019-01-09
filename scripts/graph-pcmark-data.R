@@ -5,6 +5,10 @@
 #
 # https://stackoverflow.com/a/23395844
 # https://stackoverflow.com/a/10220561
+#
+# I used this link to figure out how to add error bars:
+#
+# https://ggplot2.tidyverse.org/reference/position_dodge.html
 
 library(ggplot2)
 
@@ -20,19 +24,29 @@ myData = read.csv(inputFile, header = TRUE)
 averageMatrix = with(myData, tapply(Score, list(Benchmark, System), mean))
 stdDevMatrix = with(myData, tapply(Score, list(Benchmark, System), sd))
 
-# TODO: is there a cleaner and more automated way to do this?
-averageVector = c(averageMatrix["Data Manipulation", "Android"], averageMatrix["Data Manipulation", "Marvin"], averageMatrix["Writing 2.0", "Android"], averageMatrix["Writing 2.0", "Marvin"])
-stdDevVector = c(stdDevMatrix["Data Manipulation", "Android"], stdDevMatrix["Data Manipulation", "Marvin"], stdDevMatrix["Writing 2.0", "Android"], stdDevMatrix["Writing 2.0", "Marvin"])
-benchmarkVector = c("Data Manipulation", "Data Manipulation", "Writing 2.0", "Writing 2.0")
-systemVector = c("Android", "Marvin", "Android", "Marvin")
+averageVector = c()
+stdDevVector = c()
+benchmarkVector = c()
+systemVector = c()
+for (col in colnames(averageMatrix)) {
+    for (row in rownames(averageMatrix)) {
+        averageVector = c(averageVector, averageMatrix[row, col])
+        stdDevVector = c(stdDevVector, stdDevMatrix[row, col])
+        benchmarkVector = c(benchmarkVector, row)
+        systemVector = c(systemVector, col)
+    }
+}
 
 processedData = data.frame(averageVector, stdDevVector, benchmarkVector, systemVector)
 colnames(processedData) = c("Average", "StdDev", "Benchmark", "System")
 
 pdf(outputFile)
-ggplot(processedData) +
-    geom_col(mapping = aes(x = Benchmark, y = Average, fill = System), position = "dodge") +
+ggplot(processedData, aes(x = Benchmark, group = System)) +
+    geom_col(aes(y = Average, fill = System), position = "dodge") +
+    geom_errorbar(aes(ymin = Average - StdDev, ymax = Average + StdDev), width = 0.4, position = position_dodge(width = 0.9)) +
     xlab("Benchmark") +
     ylab("Score") +
-    labs(fill = "")
+    labs(fill = "") +
+    theme(axis.text = element_text(size=16), axis.title = element_text(size=20), legend.text = element_text(size=20)) +
+    coord_fixed(0.0004)
 dev.off()
