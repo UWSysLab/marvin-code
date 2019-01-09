@@ -21,27 +21,10 @@ outputFile = args[2]
 
 myData = read.csv(inputFile, header = TRUE)
 
-averageMatrix = with(myData, tapply(Score, list(Benchmark, System), mean))
-stdDevMatrix = with(myData, tapply(Score, list(Benchmark, System), sd))
-
-averageVector = c()
-stdDevVector = c()
-benchmarkVector = c()
-systemVector = c()
-for (col in colnames(averageMatrix)) {
-    for (row in rownames(averageMatrix)) {
-        averageVector = c(averageVector, averageMatrix[row, col])
-        stdDevVector = c(stdDevVector, stdDevMatrix[row, col])
-        benchmarkVector = c(benchmarkVector, row)
-        systemVector = c(systemVector, col)
-    }
-}
-
-processedData = data.frame(averageVector, stdDevVector, benchmarkVector, systemVector)
-colnames(processedData) = c("Average", "StdDev", "Benchmark", "System")
+print(myData)
 
 pdf(outputFile)
-ggplot(processedData, aes(x = Benchmark, group = System)) +
+ggplot(myData, aes(x = Benchmark, group = System)) +
     geom_col(aes(y = Average, fill = System), position = "dodge") +
     geom_errorbar(aes(ymin = Average - StdDev, ymax = Average + StdDev), width = 0.4, position = position_dodge(width = 0.9)) +
     xlab("Benchmark") +
