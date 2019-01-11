@@ -26,7 +26,7 @@ pdf(outputFile)
 ggplot(processedData, aes(x = ratioNonStubToStub, y = overhead)) +
     geom_point() +
     geom_line() +
-    xlab("Ratio of Marvin-augmented DEX instructions to unmodified DEX instructions") +
+    xlab("Ratio of unmodified DEX instructions to Marvin-agumented DEX instructions") +
     ylab("Marvin overhead") +
     coord_fixed(66)
 dev.off()
