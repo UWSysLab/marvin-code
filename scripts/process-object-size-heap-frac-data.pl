@@ -14,7 +14,7 @@ my $SUFFIX = ".txt";
 
 my $OUTPUT = "heapfrac-cdf-data.csv";
 
-my @APPS = ("amazon", "twitter", "washingtonpost");
+my @APPS = ("amazon", "candycrush", "googlemaps", "instagram", "pinterest", "spotify", "twitter", "washingtonpost");
 
 print("Size,HeapFrac,AppName\n");
 
