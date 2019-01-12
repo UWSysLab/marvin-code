@@ -30,6 +30,7 @@ ggplot(myData) +
     xlab("") +
     ylab("App switch time (s)") +
     labs(fill = "") +
+    theme_classic() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position="top") +
     theme(plot.margin = margin(0, 0.2, 0, 1.2, "cm")) +
     theme(axis.text = element_text(size=14), axis.title = element_text(size=18), legend.text = element_text(size=18)) +

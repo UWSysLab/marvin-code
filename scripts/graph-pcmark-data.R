@@ -31,6 +31,7 @@ ggplot(myData, aes(x = Benchmark, group = System)) +
     xlab("Benchmark") +
     ylab("Score") +
     labs(fill = "") +
+    theme_classic() +
     theme(axis.text = element_text(size=16), axis.title = element_text(size=20), legend.text = element_text(size=20)) +
     coord_fixed(0.0004)
 dev.off()
