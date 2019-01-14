@@ -24,11 +24,11 @@ overhead = (myData$Marvin_Mean_Time / myData$Stock_Android_Mean_Time)
 processedData = data.frame(ratioNonStubToStub, overhead)
 pdf(outputFile)
 ggplot(processedData, aes(x = ratioNonStubToStub, y = overhead)) +
-    geom_point() +
-    geom_line() +
+    geom_point(size = 2) +
+    geom_line(size = 1) +
     xlab("Ratio of unmodified DEX insns to Marvin-augmented insns") +
     ylab("Marvin overhead") +
     theme_classic() +
     theme(axis.text = element_text(size=16), axis.title = element_text(size=16)) +
-    coord_fixed(66)
+    coord_fixed(200)
 dev.off()
