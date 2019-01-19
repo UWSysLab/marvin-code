@@ -21,12 +21,9 @@ outputFile = args[2]
 
 myData = read.csv(inputFile, header = TRUE)
 
-# Make the column chart order the columns in order of decreasing startup time.
-myData$Name = factor(myData$Name, levels = myData$Name[order(myData$Time, decreasing = TRUE)])
-
 pdf(outputFile)
 ggplot(myData) +
-    geom_col(mapping = aes(x = Name, y = Time, fill = System)) +
+    geom_col(mapping = aes(x = Name, y = Time, fill = System), position = "dodge2") +
     xlab("") +
     ylab("App switch time (s)") +
     labs(fill = "") +
