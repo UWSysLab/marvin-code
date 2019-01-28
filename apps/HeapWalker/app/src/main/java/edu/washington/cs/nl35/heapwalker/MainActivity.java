@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
                     sleepWithCatch(SLEEP_TIME_MS);
                 }
                 else if (tempState == SECOND_FOREGROUND) {
-                    walkMixWithTiming();
+                    walkMixWithTiming(30, 30);
                     setStateLocked(DONE);
                 }
             }
@@ -81,12 +81,48 @@ public class MainActivity extends AppCompatActivity {
             Log.i(TAG, "Walked working set; total = " + total);
         }
 
-        private void walkMixWithTiming() {
+        /**
+         *
+         * @param totalArraysToTouch
+         * @param nonWorkingSetTouchPeriod The number of working set arrays to touch between each
+         *                                 touch of a non-working-set array.
+         */
+        private void walkMixWithTiming(int totalArraysToTouch, int nonWorkingSetTouchPeriod) {
+            int workingSetStartIndex = 0;
+            int nonWorkingSetStartIndex = (int)(NUM_ARRAYS * WORKING_SET_FRAC);
+
+            int currentWorkingSetIndex = workingSetStartIndex;
+            int currentNonWorkingSetIndex = nonWorkingSetStartIndex;
+            int counter = 0;
             long total = 0;
-            for (int i = 0; i < NUM_ARRAYS * WORKING_SET_FRAC; i++) {
-                total += arrays.get(i)[0];
+
+            long startTimeNs = System.nanoTime();
+            for (int i = 0; i < totalArraysToTouch; i++) {
+                boolean touchNonWorkingSet = false;
+                if (counter == nonWorkingSetTouchPeriod) {
+                    counter = 0;
+                    touchNonWorkingSet = true;
+                }
+                else {
+                    counter++;
+                }
+
+                if (touchNonWorkingSet) {
+                    total += arrays.get(currentNonWorkingSetIndex)[0];
+                    currentNonWorkingSetIndex++;
+                }
+                else {
+                    total += arrays.get(currentWorkingSetIndex)[0];
+                    currentWorkingSetIndex++;
+                }
             }
-            Log.i(TAG, "Walked working set, but in the future, I'll walk other stuff and time it.");
+            long endTimeNs = System.nanoTime();
+            double elapsedTimeMs = (endTimeNs - startTimeNs) / (1000.0 * 1000.0);
+            Log.i(TAG, "Touched " + totalArraysToTouch + " arrays, touching "
+                    + nonWorkingSetTouchPeriod
+                    + " working set arrays between each non-working set array touch; total = "
+                    + total);
+            Log.i(TAG, "Elapsed time: " + elapsedTimeMs + " ms");
         }
 
         private void sleepWithCatch(long millis) {
