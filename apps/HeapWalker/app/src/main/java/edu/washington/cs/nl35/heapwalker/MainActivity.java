@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
             if (totalArraysToTouch > NUM_WORKING_SET) {
                 Log.i(TAG, "Not touching any arrays, because totalArraysToTouch is bigger" +
                         "than NUM_WORKING_SET");
+                return;
             }
 
             int workingSetStartIndex = 0;
