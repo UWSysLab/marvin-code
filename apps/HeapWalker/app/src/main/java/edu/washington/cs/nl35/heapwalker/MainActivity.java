@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
                     sleepWithCatch(SLEEP_TIME_MS);
                 }
                 else if (tempState == SECOND_FOREGROUND) {
-                    walkMixWithTiming(30, 30);
+                    walkMixWithTiming(WALK_MIX_TOTAL_ARRAYS, WALK_MIX_NON_WS_PERIOD);
                     setStateLocked(DONE);
                 }
             }
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
         private void walkWorkingSet() {
             long total = 0;
-            for (int i = 0; i < NUM_ARRAYS * WORKING_SET_FRAC; i++) {
+            for (int i = 0; i < NUM_WORKING_SET; i++) {
                 total += arrays.get(i)[0];
             }
             Log.i(TAG, "Walked working set; total = " + total);
@@ -88,8 +88,13 @@ public class MainActivity extends AppCompatActivity {
          *                                 touch of a non-working-set array.
          */
         private void walkMixWithTiming(int totalArraysToTouch, int nonWorkingSetTouchPeriod) {
+            if (totalArraysToTouch > NUM_WORKING_SET) {
+                Log.i(TAG, "Not touching any arrays, because totalArraysToTouch is bigger" +
+                        "than NUM_WORKING_SET");
+            }
+
             int workingSetStartIndex = 0;
-            int nonWorkingSetStartIndex = (int)(NUM_ARRAYS * WORKING_SET_FRAC);
+            int nonWorkingSetStartIndex = NUM_WORKING_SET;
 
             int currentWorkingSetIndex = workingSetStartIndex;
             int currentNonWorkingSetIndex = nonWorkingSetStartIndex;
@@ -137,7 +142,9 @@ public class MainActivity extends AppCompatActivity {
     private final String TAG = "MainActivity";
     private final int NUM_ARRAYS = 200;
     private final int ARRAY_SIZE = 1024 * 1024;
-    private final double WORKING_SET_FRAC = 0.1;
+    private final int NUM_WORKING_SET = 100;
+    private final int WALK_MIX_TOTAL_ARRAYS = 100;
+    private final int WALK_MIX_NON_WS_PERIOD = 9;
 
     private WorkerRunnable worker;
     private List<byte[]> arrays;
