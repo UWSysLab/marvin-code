@@ -113,21 +113,26 @@ public class MainActivity extends AppCompatActivity {
                     counter++;
                 }
 
+                byte[] currentArray;
                 if (touchNonWorkingSet) {
-                    total += arrays.get(currentNonWorkingSetIndex)[0];
+                    currentArray = arrays.get(currentNonWorkingSetIndex);
                     currentNonWorkingSetIndex++;
                 }
                 else {
-                    total += arrays.get(currentWorkingSetIndex)[0];
+                    currentArray = arrays.get(currentWorkingSetIndex);
                     currentWorkingSetIndex++;
+                }
+
+                for (int j = 0; j < NUM_ELEMENTS_TO_TOUCH; j++) {
+                    total+= currentArray[j];
                 }
             }
             long endTimeNs = System.nanoTime();
             double elapsedTimeMs = (endTimeNs - startTimeNs) / (1000.0 * 1000.0);
-            Log.i(TAG, "Touched " + totalArraysToTouch + " arrays, touching "
+            Log.i(TAG, "Touched " + totalArraysToTouch + " arrays; touching "
                     + nonWorkingSetTouchPeriod
-                    + " working set arrays between each non-working set array touch; total = "
-                    + total);
+                    + " working set arrays between each non-working set array touch; reading "
+                    + NUM_ELEMENTS_TO_TOUCH + " elements in each array; total = " + total);
             Log.i(TAG, "Elapsed time: " + elapsedTimeMs + " ms");
         }
 
@@ -146,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
     private final int NUM_WORKING_SET = 100;
     private final int WALK_MIX_TOTAL_ARRAYS = 100;
     private final int WALK_MIX_NON_WS_PERIOD = 9;
+    private final int NUM_ELEMENTS_TO_TOUCH = 1;
 
     private WorkerRunnable worker;
     private List<byte[]> arrays;
