@@ -25,6 +25,7 @@ ggplot(myData, aes(x=reorder(System, -Speed), y=Speed)) +
     xlab("") +
     ylab("Throughput (objects touched per second)") +
     theme_classic() +
+    theme(axis.text = element_text(size=12), axis.title = element_text(size=16)) +
     scale_y_continuous(labels = scales::comma) +
     coord_fixed(ratio = 0.0000015)
 dev.off()
