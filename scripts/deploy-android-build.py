@@ -18,10 +18,11 @@ LOCAL_TEMP_DIR = '/home/nl35/research/android-memory-model/temp'
 #LOCAL_TEMP_DIR = 'C:\\Users\\niell\\Research\\android-memory-model\\temp'
 
 DEVICE_CONFIGS = [
-    # device name, product name, is production build?, Android source dir on cluster
-    ['emulator-5554', 'generic_x86', False, '/scratch/nl35/android-source-7.1.1_r57'],
-    ['ZY222WW2LM', 'shamu', False, '/scratch/nl35/android-source-7.1.1_r57'],
-    ['HT75G0200488', 'marlin', False, '/scratch/nl35/android-source-7.1.1_r57'],
+    # device name, product name, is production build?, Android source dir on cluster, preferred boot slot
+    ['emulator-5554', 'generic_x86', False, '/scratch/nl35/android-source-7.1.1_r57', None],
+    ['ZY222WW2LM', 'shamu', False, '/scratch/nl35/android-source-7.1.1_r57', None],
+    ['HT75G0200488', 'marlin', False, '/scratch/nl35/android-source-7.1.1_r57', 'a'],
+    ['HT75K0204567', 'marlin', False, '/scratch/nl35/android-source-7.1.1_r57', 'b'],
     ]
 
 def get_device_name():
@@ -69,12 +70,12 @@ def load_config(device_name):
     result_config_list = None
     num_configs = 0
     for config in DEVICE_CONFIGS:
-        if len(config) == 4 and config[0] == device_name:
+        if len(config) == 5 and config[0] == device_name:
             result_config_list = config
             num_configs += 1
     if num_configs != 1:
-        return None, None, None
-    return result_config_list[1], result_config_list[2], result_config_list[3]
+        return None, None, None, None
+    return result_config_list[1], result_config_list[2], result_config_list[3], result_config_list[4]
 
 def run_adb_shell_command(cmd, as_root=False):
     if as_root:
@@ -140,19 +141,24 @@ def deploy_libart_so(device_name, product_name, is_production_build, android_sou
     run_adb_shell_command('chmod g-w,a+r /system/lib/libart.so', as_root)
     run_adb_shell_command('chown root:root /system/lib/libart.so', as_root)
 
+# Return a dictionary mapping image names to the correct partition names
+def get_image_dict(product_name, preferred_boot_slot):
+    if product_name == 'shamu':
+        return {'boot.img':'boot', 'recovery.img':'recovery', 'system.img':'system'}
+    elif product_name == 'marlin' and preferred_boot_slot == 'a':
+        return {'boot.img':'boot', 'system.img':'system', 'system_other.img':'system_b'}
+    elif product_name == 'marlin' and preferred_boot_slot == 'b':
+        return {'boot.img':'boot', 'system.img':'system', 'system_other.img':'system_a'}
+    else:
+        return None
+
 # Copy system images from the cluster onto the local machine, and flash
 # them onto the connected Android device.
-def deploy_system_image(device_name, product_name, android_source_dir):
-    # for each product, contains a dictionary mapping image names to partition names
-    product_image_dict = {
-                          'shamu': {'boot.img':'boot', 'recovery.img':'recovery', 'system.img':'system'},
-                          'marlin': {'boot.img':'boot', 'system.img':'system', 'system_other.img':'system_b'}
-                         }
-
-    if product_name not in product_image_dict:
-        print('Unrecognized product name: ' + product_name)
+def deploy_system_image(device_name, product_name, android_source_dir, preferred_boot_slot):
+    image_dict = get_image_dict(product_name, preferred_boot_slot)
+    if image_dict is None:
+        print('No image-to-partition mapping provided for product ' + product_name + ' and preferred boot slot ' + repr(preferred_boot_slot))
         return
-    image_dict = product_image_dict[product_name]
 
     source_img_dir = android_source_dir + '/' + PRODUCT_DIR + '/' + product_name
     cluster_img_dir = source_img_dir if USING_VPN else CLUSTER_TEMP_DIR
@@ -181,17 +187,17 @@ def deploy_system_image(device_name, product_name, android_source_dir):
 
 def main():
     device_name = get_device_name()
-    product_name, is_production_build, android_source_dir = load_config(device_name)
+    product_name, is_production_build, android_source_dir, preferred_boot_slot = load_config(device_name)
 
     if not do_sanity_checks(device_name, product_name, android_source_dir):
         print('Sanity checks failed')
         return
 
-    print('Detected device %s; using product_name %s, Android source dir %s'
-          % (device_name, product_name, android_source_dir))
+    print('Detected device %s; using product_name %s, android_source_dir %s, preferred_boot_slot %s'
+          % (device_name, product_name, android_source_dir, repr(preferred_boot_slot)))
 
     #deploy_libart_so(device_name, product_name, is_production_build, android_source_dir)
-    deploy_system_image(device_name, product_name, android_source_dir);
+    deploy_system_image(device_name, product_name, android_source_dir, preferred_boot_slot);
 
 if __name__ == '__main__':
     main()
