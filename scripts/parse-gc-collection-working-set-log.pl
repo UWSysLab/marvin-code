@@ -3,6 +3,9 @@
 use warnings;
 use strict;
 
+use lib '.';
+use NielAndroidUtils qw(parseLogMessage calcTimeDiffSeconds);
+
 my $usage = "./parse-gc-collection-working-set-log.pl inputFile outputPrefix";
 die $usage unless @ARGV == 2;
 
@@ -24,11 +27,10 @@ print(GC_FILE "#seconds\tbytes\n");
 my $startTime = "";
 
 while(<INPUT_FILE>) {
-    if (/^(\d+)-(\d+)\s+(\d+):(\d+):(\d+)\.(\d+)\s+(\d+)\s+(\d+)\s+(\w+)\s+(\w+)\s*:\s*(.*)$/) {
-        my ($month, $date, $hours, $minutes, $seconds, $milliseconds) = ($1, $2, $3, $4, $5, $6);
-        my ($pid, $tid) = ($7, $8);
-        my ($logLevel, $tag, $msg) = ($9, $10, $11);
-        my $time = "$hours:$minutes:$seconds.$milliseconds";
+    my @parsedMessage = parseLogMessage($_);
+    if (@parsedMessage > 0) {
+        my $time = $parsedMessage[1];
+        my $msg = $parsedMessage[6];
         if ($startTime eq "") {
             $startTime = $time;
         }
@@ -81,23 +83,4 @@ sub getBytes {
     else {
         die "Incorrectly formatted value: $stringVal";
     }
-}
-
-sub calcTimeDiffSeconds {
-    my ($timeA, $timeB) = @_;
-    my ($hourA, $minA, $secA, $msA);
-    my ($hourB, $minB, $secB, $msB);
-    if ($timeA =~ /^(\d+):(\d+):(\d+)\.(\d+)$/) {
-        ($hourA, $minA, $secA, $msA) = ($1, $2, $3, $4);
-    }
-    else {
-        die "Incorrectly formatted time: $timeA";
-    }
-    if ($timeB =~ /^(\d+):(\d+):(\d+)\.(\d+)$/) {
-        ($hourB, $minB, $secB, $msB) = ($1, $2, $3, $4);
-    }
-    else {
-        die "Incorrectly formatted time: $timeB";
-    }
-    return ($hourB - $hourA) * 60 * 60 + ($minB - $minA) * 60 + ($secB - $secA) + ($msB - $msA) / 1000.0;
 }
