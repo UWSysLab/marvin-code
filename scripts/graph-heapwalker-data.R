@@ -12,20 +12,39 @@ library(ggplot2)
 
 args = commandArgs(trailingOnly=TRUE)
 if (length(args) < 2) {
-    stop("usage: ./graph-heapwalker-data.R input-csv output-pdf")
+    stop("usage: ./graph-heapwalker-data.R nofaults-input-csv faults-input-csv output-prefix")
 }
-inputFile = args[1]
-outputFile = args[2]
 
-myData = read.csv(inputFile, header = TRUE)
+noFaultsInputFile = args[1]
+noFaultsOutputFile = paste0(args[3], "-nofaults.pdf")
 
-pdf(outputFile)
-ggplot(myData, aes(x=reorder(System, -Speed), y=Speed)) +
+noFaultsData = read.csv(noFaultsInputFile, header = TRUE)
+
+pdf(noFaultsOutputFile)
+ggplot(noFaultsData, aes(x=reorder(System, -Speed), y=Speed)) +
     geom_col() +
     xlab("") +
-    ylab("Throughput (objects touched per second)") +
+    ylab("Throughput (objects touched/sec)") +
     theme_classic() +
-    theme(axis.text = element_text(size=12), axis.title = element_text(size=16)) +
+    theme(axis.text.x = element_text(angle=45,hjust=1)) +
+    theme(axis.text.x = element_text(size=24), axis.text.y = element_text(size=20), axis.title = element_text(size=26)) +
     scale_y_continuous(labels = scales::comma) +
     coord_fixed(ratio = 0.0000015)
+dev.off()
+
+faultsInputFile = args[2]
+faultsOutputFile = paste0(args[3], "-faults.pdf")
+
+faultsData = read.csv(faultsInputFile, header = TRUE)
+
+pdf(faultsOutputFile)
+ggplot(faultsData, aes(x=reorder(System, -Speed), y=Speed)) +
+    geom_col() +
+    xlab("") +
+    ylab("Throughput (objects touched/sec)") +
+    theme_classic() +
+    theme(axis.text.x = element_text(angle=45,hjust=1)) +
+    theme(axis.text.x = element_text(size=24), axis.text.y = element_text(size=20), axis.title = element_text(size=26)) +
+    scale_y_continuous(labels = scales::comma) +
+    coord_fixed(ratio = 0.000009)
 dev.off()
