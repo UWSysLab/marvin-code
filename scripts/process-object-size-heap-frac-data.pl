@@ -9,10 +9,10 @@
 use warnings;
 use strict;
 
-my $PREFIX = "heapfrac-hist-";
+my $PREFIX = "data/heapfrac-hist-";
 my $SUFFIX = ".txt";
 
-my $OUTPUT = "heapfrac-cdf-data.csv";
+my $OUTPUT = "data/heapfrac-cdf-data.csv";
 
 my @APPS = ("amazon", "candycrush", "googlemaps", "instagram", "pinterest", "spotify", "twitter", "washingtonpost");
 

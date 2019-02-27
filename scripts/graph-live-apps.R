@@ -27,5 +27,5 @@ ggplot(myData) +
     labs(color = "", linetype = "") +
     theme_classic() +
     theme(axis.text = element_text(size=16), axis.title=element_text(size=16), legend.text = element_text(size=16)) +
-    coord_fixed(30)
+    coord_fixed(40)
 dev.off()

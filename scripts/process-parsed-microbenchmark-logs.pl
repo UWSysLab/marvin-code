@@ -65,8 +65,8 @@ for (my $i = 0; $i < @fileNames; $i++) {
 }
 
 if (@problemFileNames > 0) {
-    print("ERROR: these files had different counts of \"win-death\" and \"die\" events:\n");
+    print(STDERR "ERROR: these files had different counts of \"win-death\" and \"die\" events:\n");
     for (my $i = 0; $i < @problemFileNames; $i++) {
-        print("$problemFileNames[$i]\n");
+        print(STDERR "$problemFileNames[$i]\n");
     }
 }
