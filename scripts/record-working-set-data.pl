@@ -32,6 +32,9 @@ while(<>) {
             my $writeWorkingSet = $1;
             print("$timeDiff,$writeWorkingSet,WRITE\n");
         }
+        elsif ($msg =~ /HomogeneousSpaceCompact marksweep \+ semispace GC/) {
+            print("$timeDiff,N/A,SEMISPACE\n");
+        }
     }
 }
 
