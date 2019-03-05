@@ -21,15 +21,16 @@ noFaultsOutputFile = paste0(args[3], "-nofaults.pdf")
 noFaultsData = read.csv(noFaultsInputFile, header = TRUE)
 
 pdf(noFaultsOutputFile)
-ggplot(noFaultsData, aes(x=reorder(System, -Speed), y=Speed)) +
+ggplot(noFaultsData, aes(x=reorder(System, -AvgSpeed), y=AvgSpeed)) +
     geom_col() +
+    geom_errorbar(aes(ymin = AvgSpeed - StddevSpeed, ymax = AvgSpeed + StddevSpeed), width = 0.4) +
     xlab("") +
     ylab("Throughput (objects touched/sec)") +
     theme_classic() +
     theme(axis.text.x = element_text(angle=45,hjust=1)) +
     theme(axis.text.x = element_text(size=24), axis.text.y = element_text(size=20), axis.title = element_text(size=26)) +
     scale_y_continuous(labels = scales::comma) +
-    coord_fixed(ratio = 0.0000015)
+    coord_fixed(ratio = 0.0000030)
 dev.off()
 
 faultsInputFile = args[2]
@@ -38,13 +39,14 @@ faultsOutputFile = paste0(args[3], "-faults.pdf")
 faultsData = read.csv(faultsInputFile, header = TRUE)
 
 pdf(faultsOutputFile)
-ggplot(faultsData, aes(x=reorder(System, -Speed), y=Speed)) +
+ggplot(faultsData, aes(x=reorder(System, -AvgSpeed), y=AvgSpeed)) +
     geom_col() +
+    geom_errorbar(aes(ymin = AvgSpeed - StddevSpeed, ymax = AvgSpeed + StddevSpeed), width = 0.4) +
     xlab("") +
     ylab("Throughput (objects touched/sec)") +
     theme_classic() +
     theme(axis.text.x = element_text(angle=45,hjust=1)) +
     theme(axis.text.x = element_text(size=24), axis.text.y = element_text(size=20), axis.title = element_text(size=26)) +
     scale_y_continuous(labels = scales::comma) +
-    coord_fixed(ratio = 0.000009)
+    coord_fixed(ratio = 0.000018)
 dev.off()
