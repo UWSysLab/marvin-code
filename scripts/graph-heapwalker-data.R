@@ -22,10 +22,10 @@ noFaultsData = read.csv(noFaultsInputFile, header = TRUE)
 
 pdf(noFaultsOutputFile)
 ggplot(noFaultsData, aes(x=reorder(System, -AvgSpeed), y=AvgSpeed)) +
-    geom_col() +
+    geom_col(fill = "#2ab248") +
     geom_errorbar(aes(ymin = AvgSpeed - StddevSpeed, ymax = AvgSpeed + StddevSpeed), width = 0.4) +
     xlab("") +
-    ylab("Throughput (objects touched/sec)") +
+    ylab("Speed (objects touched/sec)") +
     theme_classic() +
     theme(axis.text.x = element_text(angle=45,hjust=1)) +
     theme(axis.text.x = element_text(size=24), axis.text.y = element_text(size=20), axis.title = element_text(size=26)) +
@@ -40,10 +40,10 @@ faultsData = read.csv(faultsInputFile, header = TRUE)
 
 pdf(faultsOutputFile)
 ggplot(faultsData, aes(x=reorder(System, -AvgSpeed), y=AvgSpeed)) +
-    geom_col() +
+    geom_col(fill = "#2ab248") +
     geom_errorbar(aes(ymin = AvgSpeed - StddevSpeed, ymax = AvgSpeed + StddevSpeed), width = 0.4) +
     xlab("") +
-    ylab("Throughput (objects touched/sec)") +
+    ylab("Speed (objects touched/sec)") +
     theme_classic() +
     theme(axis.text.x = element_text(angle=45,hjust=1)) +
     theme(axis.text.x = element_text(size=24), axis.text.y = element_text(size=20), axis.title = element_text(size=26)) +
