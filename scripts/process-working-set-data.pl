@@ -29,6 +29,8 @@ for (my $i = 0; $i < @ARGV; $i += 2) {
     push(@files, $ARGV[$i + 1]);
 }
 
+print("Value,App,Type\n");
+
 for (my $i = 0; $i < @apps; $i++) {
     my $app = $apps[$i];
     my $file = $files[$i];
