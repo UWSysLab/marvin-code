@@ -96,17 +96,32 @@ int getSwapBit(uint64_t page) {
     return swapBit;
 }
 
-int countSwappedPages(uint64_t startAddress, uint64_t endAddress) {
+int getPresentBit(uint64_t page) {
+    unsigned char word[8];
+    readLongWordBytes(pagemapFd, page, word);
+    int swapBit = getBit(word, 63);
+    return swapBit;
+}
+
+void countSwappedAndPresentPages(uint64_t startAddress, uint64_t endAddress,
+                                 int * swappedCount, int * presentCount,
+                                 int * bothCount) {
     uint64_t startPage;
     uint64_t endPage;
     getPageRangeChecked(startAddress, endAddress, &startPage, &endPage);
 
-    int count = 0;
+    *swappedCount = 0;
+    *presentCount = 0;
+    *bothCount = 0;
     for (uint64_t page = startPage; page < endPage; page++) {
         int swapBit = getSwapBit(page);
-        count += swapBit;
+        int presentBit = getPresentBit(page);
+        *swappedCount += swapBit;
+        *presentCount += presentBit;
+        if (swapBit > 0 && presentBit > 0) {
+            *bothCount += 1;
+        }
     }
-    return count;
 }
 
 int main(int argc, char ** argv) {
@@ -132,8 +147,13 @@ int main(int argc, char ** argv) {
         exit(1);
     }
 
-    int count = countSwappedPages(startAddr, endAddr);
-    printf("Swapped pages: %d\n", count);
+    int swappedCount = 0;
+    int presentCount = 0;
+    int bothCount = 0;
+    countSwappedAndPresentPages(startAddr, endAddr, &swappedCount, &presentCount, &bothCount);
+    printf("Swapped pages: %d\n", swappedCount);
+    printf("Present pages: %d\n", presentCount);
+    printf("Pages that are both swapped and present: %d\n", bothCount);
 
     return 0;
 }
