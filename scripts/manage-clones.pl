@@ -5,15 +5,16 @@ use strict;
 
 my $PARENT_PACKAGE = "edu.washington.cs.nl35";
 my $CLONE_DIR = "/home/nl35/research/android-memory-model/temp";
+my $DEFAULT_ACTIVITY_NAME = "MainActivity";
 
 my $usage =   "usage: ./manage-clones.pl {create|delete|start|stop} ...\n"
             . "       ./manage-clones.pl create app-path num-clones\n"
-            . "       ./manage-clones.pl start  app-path num-clones start-delay\n"
+            . "       ./manage-clones.pl start  app-path num-clones start-delay [activity-name]\n"
             . "       ./manage-clones.pl stop   app-path num-clones\n"
             . "       ./manage-clones.pl delete app-path num-clones\n"
             ;
 
-my ($cmd, $appPath, $numClones, $startDelay);
+my ($cmd, $appPath, $numClones, $startDelay, $activityName);
 
 $cmd = $ARGV[0];
 if (!($cmd =~ /^create|delete|start|stop$/)) {
@@ -32,11 +33,15 @@ if ($cmd =~ /^create|delete|stop$/) {
 }
 
 if ($cmd =~ /^start$/) {
-    if (@ARGV == 4) {
+    if (@ARGV >= 4) {
         $appPath = $ARGV[1];
         $numClones = $ARGV[2];
         $startDelay = $ARGV[3];
-        print("Running command $cmd; appPath $appPath, numClones $numClones, startDelay $startDelay\n");
+        $activityName = $DEFAULT_ACTIVITY_NAME;
+        if (@ARGV == 5) {
+            $activityName = $ARGV[4];
+        }
+        print("Running command $cmd; appPath $appPath, numClones $numClones, startDelay $startDelay, activityName $activityName\n");
     }
     else {
         die $usage;
@@ -85,7 +90,7 @@ sub deleteClones {
 
 sub startClones {
     for (my $i = 0; $i < $numClones; $i++) {
-        system("adb shell am start -a android.intent.action.MAIN -n $PARENT_PACKAGE.$packageName$i/.MainActivity");
+        system("adb shell am start -a android.intent.action.MAIN -n $PARENT_PACKAGE.$packageName$i/.$activityName");
         if ($i < $numClones - 1) {
             sleep $startDelay;
         }
