@@ -12,12 +12,25 @@ public class AllocatorActivity extends BaseActivity {
     private class WorkerRunnable implements Runnable {
 
         private static final int SLEEP_TIME_MS = 1000;
+        private static final int WALKS_PER_DELETE_RECREATE = 2;
+
+        private int counter = 0;
 
         @Override
         public void run() {
             while(true) {
-                walkBuckets(NUM_BUCKETS, 0, 1);
-                sleepWithCatch(SLEEP_TIME_MS);
+                if (counter == WALKS_PER_DELETE_RECREATE) {
+                    deleteBuckets(NUM_BUCKETS / 2, 0, 2);
+                    sleepWithCatch(SLEEP_TIME_MS);
+                    recreateBuckets(NUM_BUCKETS / 2, 0 , 2);
+                    sleepWithCatch(SLEEP_TIME_MS);
+                    counter = 0;
+                }
+                else {
+                    walkBuckets(NUM_BUCKETS, 0, 1);
+                    sleepWithCatch(SLEEP_TIME_MS);
+                    counter++;
+                }
             }
         }
 
@@ -44,22 +57,27 @@ public class AllocatorActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        createBuckets();
+        createAllBuckets();
         new Thread(new WorkerRunnable()).start();
     }
 
-    private void createBuckets() {
+    private void createAllBuckets() {
         for (int i = 0; i < NUM_BUCKETS; i++) {
-            List<byte[]> bucket = new ArrayList<>();
+            List<byte[]> bucket = createBucket();
             bucketList.add(bucket);
-            for (int j = 0; j < NUM_ARRAYS_PER_BUCKET; j++) {
-                byte[] array = new byte[ARRAY_SIZE];
-                for (int k = 0; k < array.length; k++) {
-                    array[k] = INITIAL_VALUE;
-                }
-                bucket.add(array);
-            }
         }
+    }
+
+    private List<byte[]> createBucket() {
+        List<byte[]> bucket = new ArrayList<>();
+        for (int i = 0; i < NUM_ARRAYS_PER_BUCKET; i++) {
+            byte[] array = new byte[ARRAY_SIZE];
+            for (int j = 0; j < array.length; j++) {
+                array[j] = INITIAL_VALUE;
+            }
+            bucket.add(array);
+        }
+        return bucket;
     }
 
     /**
@@ -83,5 +101,40 @@ public class AllocatorActivity extends BaseActivity {
             currentBucketIndex = currentBucketIndex % bucketList.size();
         }
         Log.i(TAG, "Walked buckets; total = " + total);
+    }
+
+    /**
+     * Delete the specified buckets.
+     * @param numBuckets the number of buckets to recreate
+     * @param startingBucketIndex the index of the bucket to start on
+     * @param stride the difference between the index of the next and current bucket
+     */
+    private void deleteBuckets(int numBuckets, int startingBucketIndex, int stride) {
+        int currentBucketIndex = startingBucketIndex;
+        for (int i = 0; i < numBuckets; i++) {
+            bucketList.set(currentBucketIndex, null);
+            currentBucketIndex += stride;
+            currentBucketIndex = currentBucketIndex % bucketList.size();
+        }
+        Log.i(TAG, "Deleted " + numBuckets + " buckets starting at " + startingBucketIndex
+                + " with stride " + stride);
+    }
+
+    /**
+     * Recreate the specified buckets.
+     * @param numBuckets the number of buckets to recreate
+     * @param startingBucketIndex the index of the bucket to start on
+     * @param stride the difference between the index of the next and current bucket
+     */
+    private void recreateBuckets(int numBuckets, int startingBucketIndex, int stride) {
+        int currentBucketIndex = startingBucketIndex;
+        for (int i = 0; i < numBuckets; i++) {
+            List<byte[]> bucket = createBucket();
+            bucketList.set(currentBucketIndex, bucket);
+            currentBucketIndex += stride;
+            currentBucketIndex = currentBucketIndex % bucketList.size();
+        }
+        Log.i(TAG, "Recreated " + numBuckets + " buckets starting at " + startingBucketIndex
+                + " with stride " + stride);
     }
 }
