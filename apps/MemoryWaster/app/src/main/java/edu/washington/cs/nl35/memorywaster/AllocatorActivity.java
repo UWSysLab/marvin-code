@@ -43,19 +43,25 @@ public class AllocatorActivity extends BaseActivity {
     }
 
     /**
-     * A workload that repeatedly deletes and recreates every fifth bucket, with a short sleep
+     * A workload that repeatedly deletes and recreates every Nth bucket, with a short sleep
      * between deletion and recreation and a longer sleep between rounds.
      */
     private class RecreateSomeRunnable implements Runnable {
         private static final int BETWEEN_ACTIONS_SLEEP_TIME_MS = 1000;
-        private static final int BETWEEN_ROUNDS_SLEEP_TIME_MS = 10 * 1000;
+        private static final int BETWEEN_ROUNDS_SLEEP_TIME_MS = 5 * 1000;
+
+        private int stride;
+
+        public RecreateSomeRunnable(int stride) {
+            this.stride = stride;
+        }
 
         @Override
         public void run() {
             while(true) {
-                deleteBuckets(NUM_BUCKETS / 5, 0, 5);
+                deleteBuckets(NUM_BUCKETS / stride, 0, stride);
                 sleepWithCatch(BETWEEN_ACTIONS_SLEEP_TIME_MS);
-                recreateBuckets(NUM_BUCKETS / 5, 0 , 5);
+                recreateBuckets(NUM_BUCKETS / stride, 0 , stride);
                 sleepWithCatch(BETWEEN_ROUNDS_SLEEP_TIME_MS);
             }
         }
@@ -64,7 +70,7 @@ public class AllocatorActivity extends BaseActivity {
     private static final String TAG = "AllocatorActivity";
     private static final byte INITIAL_VALUE = 42;
 
-    private static final int NUM_BUCKETS = 10;
+    private static final int NUM_BUCKETS = 25;
     private static final int ARRAY_SIZE = 4076;
     private static final int NUM_ARRAYS_PER_BUCKET = 5120;
 
@@ -76,7 +82,8 @@ public class AllocatorActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         createAllBuckets();
-        new Thread(new WalkAndRecreateRunnable()).start();
+        Runnable workload = new RecreateSomeRunnable(25);
+        new Thread(workload).start();
     }
 
     private void createAllBuckets() {
