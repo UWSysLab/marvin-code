@@ -118,7 +118,8 @@ public class AllocatorActivity extends BaseActivity {
             currentBucketIndex += stride;
             currentBucketIndex = currentBucketIndex % bucketList.size();
         }
-        Log.i(TAG, "Walked buckets; total = " + total);
+        Log.i(TAG, "Walked " + numBuckets + " buckets starting at " + startingBucketIndex
+                + " with stride " + stride + "; total = " + total);
     }
 
     /**
