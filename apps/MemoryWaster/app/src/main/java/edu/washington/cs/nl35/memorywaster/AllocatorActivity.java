@@ -9,15 +9,22 @@ import java.util.List;
 
 public class AllocatorActivity extends BaseActivity {
 
-    private class WorkerRunnable implements Runnable {
-
+    /**
+     * A workload that performs the following actions repeatedly, with short sleeps in between each
+     * action:
+     * 1) Walk all buckets.
+     * 2) Walk all buckets.
+     * 3) Delete all even-numbered buckets.
+     * 4) Recreate all even-numbered buckets.
+     */
+    private class WalkAndRecreateRunnable implements Runnable {
         private static final int SLEEP_TIME_MS = 1000;
         private static final int WALKS_PER_DELETE_RECREATE = 2;
 
-        private int counter = 0;
-
         @Override
         public void run() {
+            int counter = 0;
+
             while(true) {
                 if (counter == WALKS_PER_DELETE_RECREATE) {
                     deleteBuckets(NUM_BUCKETS / 2, 0, 2);
@@ -33,12 +40,23 @@ public class AllocatorActivity extends BaseActivity {
                 }
             }
         }
+    }
 
-        private void sleepWithCatch(long millis) {
-            try {
-                Thread.sleep(millis);
-            } catch (InterruptedException e) {
-                Log.i(TAG, "Thread.sleep() call interrupted");
+    /**
+     * A workload that repeatedly deletes and recreates every fifth bucket, with a short sleep
+     * between deletion and recreation and a longer sleep between rounds.
+     */
+    private class RecreateSomeRunnable implements Runnable {
+        private static final int BETWEEN_ACTIONS_SLEEP_TIME_MS = 1000;
+        private static final int BETWEEN_ROUNDS_SLEEP_TIME_MS = 10 * 1000;
+
+        @Override
+        public void run() {
+            while(true) {
+                deleteBuckets(NUM_BUCKETS / 5, 0, 5);
+                sleepWithCatch(BETWEEN_ACTIONS_SLEEP_TIME_MS);
+                recreateBuckets(NUM_BUCKETS / 5, 0 , 5);
+                sleepWithCatch(BETWEEN_ROUNDS_SLEEP_TIME_MS);
             }
         }
     }
@@ -58,7 +76,7 @@ public class AllocatorActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         createAllBuckets();
-        new Thread(new WorkerRunnable()).start();
+        new Thread(new WalkAndRecreateRunnable()).start();
     }
 
     private void createAllBuckets() {
@@ -136,5 +154,13 @@ public class AllocatorActivity extends BaseActivity {
         }
         Log.i(TAG, "Recreated " + numBuckets + " buckets starting at " + startingBucketIndex
                 + " with stride " + stride);
+    }
+
+    private void sleepWithCatch(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Log.i(TAG, "Thread.sleep() call interrupted");
+        }
     }
 }
