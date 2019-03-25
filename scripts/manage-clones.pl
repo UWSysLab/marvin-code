@@ -7,21 +7,23 @@ my $PARENT_PACKAGE = "edu.washington.cs.nl35";
 my $CLONE_DIR = "/home/nl35/research/android-memory-model/temp";
 my $DEFAULT_ACTIVITY_NAME = "MainActivity";
 
-my $usage =   "usage: ./manage-clones.pl {create|delete|start|stop} ...\n"
+my $usage =   "usage: ./manage-clones.pl {create|delete|install|uninstall|start|stop} ...\n"
             . "       ./manage-clones.pl create app-path num-clones\n"
+            . "       ./manage-clones.pl install app-path num-clones\n"
             . "       ./manage-clones.pl start  app-path num-clones start-delay [activity-name]\n"
             . "       ./manage-clones.pl stop   app-path num-clones\n"
+            . "       ./manage-clones.pl uninstall app-path num-clones\n"
             . "       ./manage-clones.pl delete app-path num-clones\n"
             ;
 
 my ($cmd, $appPath, $numClones, $startDelay, $activityName);
 
 $cmd = $ARGV[0];
-if (!($cmd =~ /^create|delete|start|stop$/)) {
+if (!($cmd =~ /^create|delete|install|uninstall|start|stop$/)) {
     die $usage;
 }
 
-if ($cmd =~ /^create|delete|stop$/) {
+if ($cmd =~ /^create|delete|install|uninstall|stop$/) {
     if (@ARGV == 3) {
         $appPath = $ARGV[1];
         $numClones = $ARGV[2];
@@ -57,6 +59,12 @@ if ($cmd =~ /create/) {
 elsif ($cmd =~ /delete/) {
     deleteClones();
 }
+elsif ($cmd =~ /^install$/) {
+    installClones();
+}
+elsif ($cmd =~ /^uninstall$/) {
+    uninstallClones();
+}
 elsif ($cmd =~ /start/) {
     startClones();
 }
@@ -68,7 +76,9 @@ sub createClones {
     for (my $i = 0; $i < $numClones; $i++) {
         system("./clone-project.pl $PARENT_PACKAGE $appPath $CLONE_DIR/$appName$i");
     }
+}
 
+sub installClones {
     my $workingDir = `pwd`;
     chomp($workingDir);
     for (my $i = 0; $i < $numClones; $i++) {
@@ -78,11 +88,13 @@ sub createClones {
     }
 }
 
-sub deleteClones {
+sub uninstallClones {
     for (my $i = 0; $i < $numClones; $i++) {
         system("adb uninstall $PARENT_PACKAGE.$packageName$i");
     }
+}
 
+sub deleteClones {
     for (my $i = 0; $i < $numClones; $i++) {
         system("rm -r $CLONE_DIR/$appName$i");
     }
