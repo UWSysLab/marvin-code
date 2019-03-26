@@ -10,7 +10,7 @@ my $DEFAULT_ACTIVITY_NAME = "MainActivity";
 my $usage =   "usage: ./manage-clones.pl {create|delete|install|uninstall|start|stop} ...\n"
             . "       ./manage-clones.pl create app-path num-clones\n"
             . "       ./manage-clones.pl install app-path num-clones\n"
-            . "       ./manage-clones.pl start  app-path num-clones start-delay [activity-name]\n"
+            . "       ./manage-clones.pl start  app-path num-clones start-delay activity-name\n"
             . "       ./manage-clones.pl stop   app-path num-clones\n"
             . "       ./manage-clones.pl uninstall app-path num-clones\n"
             . "       ./manage-clones.pl delete app-path num-clones\n"
@@ -35,14 +35,11 @@ if ($cmd =~ /^create|delete|install|uninstall|stop$/) {
 }
 
 if ($cmd =~ /^start$/) {
-    if (@ARGV >= 4) {
+    if (@ARGV == 5) {
         $appPath = $ARGV[1];
         $numClones = $ARGV[2];
         $startDelay = $ARGV[3];
-        $activityName = $DEFAULT_ACTIVITY_NAME;
-        if (@ARGV == 5) {
-            $activityName = $ARGV[4];
-        }
+        $activityName = $ARGV[4];
         print("Running command $cmd; appPath $appPath, numClones $numClones, startDelay $startDelay, activityName $activityName\n");
     }
     else {
