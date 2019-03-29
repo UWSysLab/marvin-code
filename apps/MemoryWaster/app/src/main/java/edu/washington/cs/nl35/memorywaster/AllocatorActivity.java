@@ -69,6 +69,7 @@ public class AllocatorActivity extends BaseActivity {
 
     private static final String TAG = "AllocatorActivity";
     private static final byte INITIAL_VALUE = 42;
+    private static final int PAGE_SIZE = 4096;
 
     private static final int NUM_BUCKETS = 22;
     private static final int ARRAY_SIZE = 4076;
@@ -99,7 +100,7 @@ public class AllocatorActivity extends BaseActivity {
         List<byte[]> bucket = new ArrayList<>();
         for (int i = 0; i < NUM_ARRAYS_PER_BUCKET; i++) {
             byte[] array = new byte[ARRAY_SIZE];
-            for (int j = 0; j < array.length; j++) {
+            for (int j = 0; j < array.length; j += PAGE_SIZE) {
                 array[j] = INITIAL_VALUE;
             }
             bucket.add(array);
