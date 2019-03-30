@@ -51,7 +51,7 @@ int main(int argc, char ** argv) {
 
     printf("Allocated and touched the pages of %d arrays of size %d in %d ms (using page size %d)\n", numArrays, ARRAY_SIZE, timeDiffMs, PAGE_SIZE);
 
-    printf("Staying alive for three seconds...\n");
-    sleep(3);
+    printf("Staying alive for ten seconds...\n");
+    sleep(10);
     printf("Exiting.\n");
 }
