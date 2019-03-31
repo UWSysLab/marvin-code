@@ -19,6 +19,7 @@ use NielAndroidUtils qw(parseLogMessage calcTimeDiffSeconds);
 
 my $STATUS_ACTIVE = 0;
 my $STATUS_INACTIVE = 1;
+my $STATUS_DEAD = 2;
 
 my $INACTIVE_TIMEOUT = 20; # seconds
 my $ACTIVE_THRESHOLD = 7; # seconds
@@ -47,6 +48,7 @@ while(<>) {
         if ($msg =~ /^Process $CLONE_NAME(\d+) \(pid (\d+)\) has died$/) {
             my $cloneNum = $1;
             my $diedPid = $2;
+            $pidStatuses{$diedPid} = $STATUS_DEAD;
             print("$time\t$diedPid\t$cloneNum\tdie\n");
         }
         if ($msg =~ /^WIN DEATH: Window\{\w+ \w+ $CLONE_NAME(\d+)\/$CLONE_NAME\d+\.MainActivity\}$/) {
