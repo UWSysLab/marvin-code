@@ -24,6 +24,7 @@ my $STATUS_DEAD = 2;
 my $INACTIVE_TIMEOUT = 20; # seconds
 my $ACTIVE_THRESHOLD = 7; # seconds
 my $CLONE_NAME = "edu.washington.cs.nl35.memorywaster";
+my $ACTIVITY_NAME = "AllocatorActivity";
 
 my $startTime = "";
 my %pidTimes;
@@ -51,11 +52,11 @@ while(<>) {
             $pidStatuses{$diedPid} = $STATUS_DEAD;
             print("$time\t$diedPid\t$cloneNum\tdie\n");
         }
-        if ($msg =~ /^WIN DEATH: Window\{\w+ \w+ $CLONE_NAME(\d+)\/$CLONE_NAME\d+\.MainActivity\}$/) {
+        if ($msg =~ /^WIN DEATH: Window\{\w+ \w+ $CLONE_NAME(\d+)\/$CLONE_NAME\d+\.$ACTIVITY_NAME\}$/) {
             my $cloneNum = $1;
             print("$time\t-\t$cloneNum\twin-death\n");
         }
-        if ($msg =~ /^START u0 \{act=android\.intent\.action\.MAIN flg=0x10000000 cmp=$CLONE_NAME(\d+)\/\.MainActivity\} from uid \d+ on display \d+$/) {
+        if ($msg =~ /^START u0 \{act=android\.intent\.action\.MAIN flg=0x10000000 cmp=$CLONE_NAME(\d+)\/\.$ACTIVITY_NAME\} from uid \d+ on display \d+$/) {
             my $cloneNum = $1;
             print("$time\t-\t$cloneNum\tstart-intent\n");
         }
