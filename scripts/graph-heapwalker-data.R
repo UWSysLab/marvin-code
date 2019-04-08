@@ -30,7 +30,7 @@ ggplot(noFaultsData, aes(x=reorder(System, -AvgSpeed), y=AvgSpeed)) +
     theme(axis.text.x = element_text(angle=45,hjust=1)) +
     theme(axis.text.x = element_text(size=24), axis.text.y = element_text(size=20), axis.title = element_text(size=26)) +
     scale_y_continuous(labels = scales::comma) +
-    coord_fixed(ratio = 0.0000030)
+    coord_fixed(ratio = 0.0000040)
 dev.off()
 
 faultsInputFile = args[2]

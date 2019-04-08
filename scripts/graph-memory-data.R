@@ -22,5 +22,5 @@ ggplot(myData) +
     labs(color = "Working set", linetype = "Working set") +
     theme_classic() +
     theme(axis.text = element_text(size=16), axis.title = element_text(size=16), legend.text = element_text(size=16), legend.title = element_text(size=16)) +
-    coord_fixed(1)
+    coord_fixed(0.8)
 dev.off()
