@@ -21,11 +21,12 @@ myData = read.csv(inputFile, header = TRUE)
 
 pdf(outputFile)
 ggplot(myData) +
-    geom_line(mapping = aes(x = Time, y = NumLiveApps, linetype = Label, color = Label), size = 1) +
+    geom_line(mapping = aes(x = Time, y = NumLiveApps, color = Label), size = 1) +
     xlab("Time (s)") +
-    ylab("Num live apps") +
+    ylab("Num active apps") +
     labs(color = "", linetype = "") +
     theme_classic() +
     theme(axis.text = element_text(size=16), axis.title=element_text(size=16), legend.text = element_text(size=16)) +
-    coord_fixed(40)
+    scale_color_manual(values=c("#ff9999", "#33aa33", "#0000aa")) +
+    coord_fixed(600)
 dev.off()
