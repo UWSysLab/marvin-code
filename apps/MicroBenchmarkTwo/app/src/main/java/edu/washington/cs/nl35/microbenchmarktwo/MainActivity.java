@@ -16,8 +16,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int SLEEP_TIME_MS = 200;
     private static final int ITERS_PER_ROUND = 100000;
-    private static final int INT_OP_LOOPS_PER_ITER = 100;
-    private static final int OBJ_OP_LOOPS_PER_ITER = 100;
+    private static final int INT_OP_LOOPS_PER_ITER = 99;
+    private static final int OBJ_OP_LOOPS_PER_ITER = 101;
 
     private class WorkerRunnable implements Runnable {
         @Override
