@@ -12,7 +12,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    private static final int NUM_ARRAYS = 200;
     private static final int ARRAY_SIZE = 256 * 1024;
 
     private static final int SLEEP_TIME_MS = 200;
@@ -20,7 +19,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int INT_OP_LOOPS_PER_ITER = 100;
     private static final int OBJ_OP_LOOPS_PER_ITER = 100;
 
-    private List<int[]> arrays;
+    private int[] arrayA = new int[ARRAY_SIZE];
+    private int[] arrayB = new int[ARRAY_SIZE];
 
     private class WorkerRunnable implements Runnable {
         @Override
@@ -35,8 +35,6 @@ public class MainActivity extends AppCompatActivity {
 
                 long startTimeMillis = System.nanoTime() / (1000 * 1000);
                 for (int i = 0; i < ITERS_PER_ROUND; i++) {
-                    int[] arrayA = arrays.get(i % NUM_ARRAYS);
-                    int[] arrayB = arrays.get((i + 1) % NUM_ARRAYS);
                     int valA = arrayA[0];
                     int valB = arrayB[0];
                     for (int j = 0; j < INT_OP_LOOPS_PER_ITER; j++) {
@@ -62,12 +60,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        arrays = new ArrayList<>();
-        for (int i = 0; i < NUM_ARRAYS; i++) {
-            int[] array = new int[ARRAY_SIZE];
-            Arrays.fill(array, 42);
-            arrays.add(array);
-        }
+        Arrays.fill(arrayA, 42);
+        Arrays.fill(arrayB, 138);
 
         Log.i(TAG, getApplicationContext().getPackageName() + " onCreate finished");
 
