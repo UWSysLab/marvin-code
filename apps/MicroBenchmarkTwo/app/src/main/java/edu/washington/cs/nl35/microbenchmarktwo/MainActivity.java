@@ -19,9 +19,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int INT_OP_LOOPS_PER_ITER = 100;
     private static final int OBJ_OP_LOOPS_PER_ITER = 100;
 
-    private int[] arrayA = new int[ARRAY_SIZE];
-    private int[] arrayB = new int[ARRAY_SIZE];
-
     private class WorkerRunnable implements Runnable {
         @Override
         public void run() {
@@ -32,6 +29,11 @@ public class MainActivity extends AppCompatActivity {
                 catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+
+                int[] arrayA = new int[ARRAY_SIZE];
+                int[] arrayB = new int[ARRAY_SIZE];
+                Arrays.fill(arrayA, 42);
+                Arrays.fill(arrayB, 138);
 
                 long startTimeMillis = System.nanoTime() / (1000 * 1000);
                 for (int i = 0; i < ITERS_PER_ROUND; i++) {
@@ -59,9 +61,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Arrays.fill(arrayA, 42);
-        Arrays.fill(arrayB, 138);
 
         Log.i(TAG, getApplicationContext().getPackageName() + " onCreate finished");
 
