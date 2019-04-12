@@ -46,7 +46,7 @@ ggplot(faultsData, aes(x=reorder(System, -AvgSpeed), y=AvgSpeed)) +
     ylab("Speed (objects touched/sec)") +
     theme_classic() +
     theme(axis.text.x = element_text(angle=45,hjust=1)) +
-    theme(axis.text.x = element_text(size=24), axis.text.y = element_text(size=20), axis.title = element_text(size=26)) +
+    theme(axis.text.x = element_text(size=16), axis.text.y = element_text(size=16), axis.title = element_text(size=20)) +
     scale_y_continuous(labels = scales::comma) +
-    coord_fixed(ratio = 0.000018)
+    coord_fixed(ratio = 0.000008)
 dev.off()
