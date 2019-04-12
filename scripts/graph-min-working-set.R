@@ -32,9 +32,9 @@ combinedData = rbind(minWsData, footprintData)
 pdf(outputFile)
 ggplot(combinedData, aes(x = App)) +
     geom_col(aes(y = Value, fill = Type), position = "dodge") +
-    xlab("App") +
     ylab("Memory (MB)") +
     theme_classic() +
+    theme(axis.title.x = element_blank()) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     theme(axis.text = element_text(size=14), axis.title = element_text(size=16)) +
     theme(legend.title = element_blank(), legend.text = element_text(size=14)) +
