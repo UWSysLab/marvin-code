@@ -22,6 +22,11 @@ public class MainActivity extends AppCompatActivity {
     private class WorkerRunnable implements Runnable {
         @Override
         public void run() {
+            int[] arrayA = new int[ARRAY_SIZE];
+            int[] arrayB = new int[ARRAY_SIZE];
+            Arrays.fill(arrayA, 42);
+            Arrays.fill(arrayB, 138);
+
             while (true) {
                 try {
                     Thread.sleep(SLEEP_TIME_MS);
@@ -29,11 +34,6 @@ public class MainActivity extends AppCompatActivity {
                 catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
-                int[] arrayA = new int[ARRAY_SIZE];
-                int[] arrayB = new int[ARRAY_SIZE];
-                Arrays.fill(arrayA, 42);
-                Arrays.fill(arrayB, 138);
 
                 long startTimeMillis = System.nanoTime() / (1000 * 1000);
                 for (int i = 0; i < ITERS_PER_ROUND; i++) {
