@@ -29,6 +29,6 @@ ggplot(myData, aes(x = fracOAI, y = Mean)) +
     xlab("Fraction of DEX instructions with OAI") +
     ylab("Marvin overhead") +
     theme_classic() +
-    theme(axis.text = element_text(size=16), axis.title = element_text(size=16)) +
-    coord_fixed(0.05)
+    theme(axis.text = element_text(size=18), axis.title = element_text(size=20)) +
+    coord_fixed(0.04)
 dev.off()
