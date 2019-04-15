@@ -24,5 +24,6 @@ ggplot(myData) +
     ylab("Memory allocated (MB)") +
     theme_classic() +
     theme(axis.text = element_text(size=16), axis.title = element_text(size=16), legend.text = element_text(size=16), legend.title = element_blank()) +
-    coord_fixed(10)
+    theme(legend.position = c(0.7,0.3)) +
+    coord_fixed(6)
 dev.off()
