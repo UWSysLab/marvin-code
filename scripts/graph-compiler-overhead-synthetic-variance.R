@@ -21,11 +21,16 @@ myData$totalDEX = 7 + 100000 * (16 + 8 * myData$INT_OP_LOOPS_PER_ITER + 9 * myDa
 myData$totalOAI = 100000 * (2 + 4 * myData$OBJ_OP_LOOPS_PER_ITER)
 myData$fracOAI = myData$totalOAI / myData$totalDEX
 
+# Add a mocked-up data point at (0, 0)
+newData = data.frame(NA, NA, 0, NA, NA, NA, 0)
+names(newData) = c("INT_OP_LOOPS_PER_ITER", "OBJ_OP_LOOPS_PER_ITER", "Mean", "Stddev", "totalDEX", "totalOAI", "fracOAI")
+myData = rbind(myData, newData)
+
 pdf(outputFile)
 ggplot(myData, aes(x = fracOAI, y = Mean)) +
     geom_point(size = 2) +
     geom_line(size = 1) +
-    geom_errorbar(aes(ymin = Mean - Stddev, ymax = Mean + Stddev)) +
+    geom_errorbar(aes(ymin = Mean - Stddev, ymax = Mean + Stddev), width = 0.015) +
     xlab("Fraction of DEX instructions with OAI") +
     ylab("Marvin overhead") +
     theme_classic() +
