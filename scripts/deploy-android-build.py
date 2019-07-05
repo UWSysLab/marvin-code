@@ -102,7 +102,7 @@ def copy_file(remote_path, local_path):
             return subprocess.run(['scp', CLUSTER_USERNAME + '@' + CLUSTER_MACHINE + ':' + remote_path, local_path])
     if os.name == 'nt':
         if os.path.isdir(local_path):
-            local_path = os.path.join(local_path, os.sep)
+            local_path = local_path + os.sep
         return subprocess.run(['winscp.com', '/command', 'open ' + CLUSTER_USERNAME + '@' + CLUSTER_FRONTEND, 'get ' + remote_path + ' ' + local_path, 'exit'])
     else:
         return subprocess.run(['scp', CLUSTER_USERNAME + '@' + CLUSTER_FRONTEND + ':' + remote_path, local_path])
