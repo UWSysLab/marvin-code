@@ -32,5 +32,6 @@ ggplot(myData) +
     theme(plot.margin = margin(0, 0.2, 0, 1.2, "cm")) +
     theme(axis.text = element_text(size=14), axis.title = element_text(size=18), legend.text = element_text(size=18)) +
     theme(legend.position = c(0.7, 0.8)) +
+    scale_fill_manual(values = c("#660000", "#66CCFF")) +
     coord_fixed(0.3)
 dev.off()
