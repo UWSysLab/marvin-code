@@ -4,18 +4,18 @@ import os
 import subprocess
 import sys
 
-CLUSTER_MACHINE = '10.100.1.2'
+CLUSTER_MACHINE = 'guanaco'
 CLUSTER_FRONTEND = 'zookeeper.cs.washington.edu'
 CLUSTER_USERNAME = 'nl35'
-USING_VPN = True
+USING_VPN = False
 
 PRODUCT_DIR = 'out/target/product'
 LIBART_PATH = 'obj/lib/libart.so'
 CLUSTER_TEMP_DIR = '/biggerraid/users/nl35/temp'
 ANDROID_TEMP_DIR = '/storage/emulated/0/Download'
 
-LOCAL_TEMP_DIR = '/home/nl35/research/android-memory-model/temp'
-#LOCAL_TEMP_DIR = 'C:\\Users\\niell\\Research\\android-memory-model\\temp'
+#LOCAL_TEMP_DIR = '/home/nl35/research/android-memory-model/temp'
+LOCAL_TEMP_DIR = 'C:\\Users\\Niel\\Research\\android-memory-model\\temp'
 
 DEVICE_CONFIGS = [
     # device name, product name, is production build?, Android source dir on cluster, preferred boot slot
