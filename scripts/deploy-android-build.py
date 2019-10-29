@@ -146,9 +146,9 @@ def get_image_dict(product_name, preferred_boot_slot):
     if product_name == 'shamu':
         return {'boot.img':'boot', 'recovery.img':'recovery', 'system.img':'system'}
     elif product_name == 'marlin' and preferred_boot_slot == 'a':
-        return {'boot.img':'boot', 'system.img':'system', 'system_other.img':'system_b'}
+        return {'boot.img':'boot_a', 'system.img':'system_a', 'system_other.img':'system_b'}
     elif product_name == 'marlin' and preferred_boot_slot == 'b':
-        return {'boot.img':'boot', 'system.img':'system', 'system_other.img':'system_a'}
+        return {'boot.img':'boot_b', 'system.img':'system_b', 'system_other.img':'system_a'}
     else:
         return None
 
