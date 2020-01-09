@@ -35,5 +35,5 @@ ggplot(myData, aes(x = fracOAI, y = Mean)) +
     ylab("Marvin overhead") +
     theme_classic() +
     theme(axis.text = element_text(size=18), axis.title = element_text(size=20)) +
-    coord_fixed(0.04)
+    coord_fixed(0.035)
 dev.off()

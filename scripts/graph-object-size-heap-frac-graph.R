@@ -24,11 +24,11 @@ ggplot(myData) +
     geom_line(mapping = aes(x = Size, y = HeapFrac, color = AppName)) +
     geom_point(mapping = aes(x = Size, y = HeapFrac, color = AppName, shape = AppName), size = 2) +
     xlab("Object size (bytes, log scale)") +
-    ylab("Cumulative fraction of heap") +
+    ylab("Cumulative heap fraction") +
     labs(color = "App", shape = "App") +
     scale_x_continuous(trans='log10') +
     scale_shape_manual(values=1:nlevels(myData$AppName)) +
     theme_classic() +
     theme(axis.text = element_text(size=16), axis.title = element_text(size=16), legend.text = element_text(size=16), legend.title = element_text(size=16)) +
-    coord_fixed(ratio=4.5)
+    coord_fixed(ratio=3.5)
 dev.off()

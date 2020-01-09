@@ -34,5 +34,5 @@ ggplot(myData, aes(x = Benchmark, group = System)) +
     theme_classic() +
     theme(axis.text = element_text(size=16), axis.title = element_text(size=20), legend.text = element_text(size=20)) +
     scale_fill_manual(values = c("#660000", "#66CCFF")) +
-    coord_fixed(0.00025)
+    coord_fixed(0.00022)
 dev.off()

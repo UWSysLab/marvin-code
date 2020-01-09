@@ -40,5 +40,5 @@ ggplot(combinedData, aes(x = App)) +
     theme(legend.title = element_blank(), legend.text = element_text(size=14)) +
     #scale_fill_discrete(breaks = c("active_fg_read_min", "memory_footprint"), labels = c("Min. read WS", "Heap size")) +
     scale_fill_manual(breaks = c("active_fg_read_min", "memory_footprint"), labels = c("Min. read WS", "Heap size"), values = c("#660000", "#66CCFF")) +
-    coord_fixed(0.03)
+    coord_fixed(0.025)
 dev.off()
