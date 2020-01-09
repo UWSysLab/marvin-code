@@ -10,7 +10,7 @@ system("Rscript graph-compiler-overhead-synthetic-variance.R data/compiler-synth
 system("perl process-object-size-heap-frac-data.pl > data/heapfrac-data.txt");
 system("Rscript graph-object-size-heap-frac-graph.R data/heapfrac-data.txt graphs/cumulative-heap-frac-vs-object-size.pdf");
 
-system("Rscript process-parsed-allocatoractivity-logs.pl \\\
+system("perl process-parsed-allocatoractivity-logs.pl \\\
 data/bookmarking-gc-2019-3-26/parsed-marvin.txt \"Marvin (4KB)\" \\\
 data/bookmarking-gc-2019-3-26/parsed-android-swap.txt \"Android+swap (4KB)\" \\\
 data/bookmarking-gc-2019-3-26/parsed-android-noswap.txt \"Android\" \\\

@@ -20,7 +20,7 @@ print("Size,HeapFrac,AppName\n");
 
 foreach my $app (@APPS) {
     my $fileName = "$PREFIX$app$SUFFIX";
-    my @lines = `./histogram-to-cdf.pl $fileName`;
+    my @lines = `perl histogram-to-cdf.pl $fileName`;
     foreach my $line (@lines) {
         chomp($line);
         print("$line,$app\n");
